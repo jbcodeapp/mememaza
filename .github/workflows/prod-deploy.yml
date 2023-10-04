@@ -65,7 +65,5 @@ jobs:
         run: sudo rm -r  /var/www/storage.temp
       - name: Storage Link
         run: php artisan storage:link
-      - name: Make directories
-        run: mkdir /var/www/actions-runner/_work/mememaza/mememaza/storage/framework/sessions
       - name: Directory Permissions
         run: sudo chmod -R 777 storage bootstrap/cache
