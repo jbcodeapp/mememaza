@@ -36,7 +36,7 @@ jobs:
       - name: Set up .env variables
         run: |
           echo "Copying environment variables from Github.." 
-          echo "APP_URL=https://pharmacyxp.com" >> .env
+          echo "APP_URL=https://santrash.com/" >> .env
           echo "APP_ENV=production" >> .env
           echo "APP_DEBUG=false" >> .env
           echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
@@ -47,7 +47,7 @@ jobs:
           echo "APP_VERSION_UPDATED_ON=$(date +'%Y-%m-%dT%H:%M:%S')" >> .env
           echo ".env file made"
       - name: Composer Update
-        run:  mkdir storage/framework && mkdir storage/framework/views && composer update
+        run: composer update
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Generate key
