@@ -30,6 +30,8 @@ jobs:
             exit 1
           fi
       - uses: actions/checkout@v3
+      - name: Change directory to /admin
+        run: cd admin/
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
@@ -47,7 +49,7 @@ jobs:
           echo "APP_VERSION_UPDATED_ON=$(date +'%Y-%m-%dT%H:%M:%S')" >> .env
           echo ".env file made"
       - name: Composer Update
-        run: mkdir storage/framework && mkdir storage/framework/views && composer update
+        run:  mkdir storage/framework && mkdir storage/framework/views && composer update
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Generate key
