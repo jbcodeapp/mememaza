@@ -31,7 +31,7 @@ jobs:
           fi
       - uses: actions/checkout@v3
       - name: Change directory to /admin
-        run: cd admin/
+        run: cd admin/ && ls
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
