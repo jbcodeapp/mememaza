@@ -20,6 +20,15 @@ jobs:
         run: sudo chown -R $USER:$USER /var/www/actions-runner/_work/mememaza
       - name: Storage Files/Logs Backup
         run: sudo rsync -av --progress /var/www/mememaza/storage /var/www/storage.temp --exclude debugbar --exclude framework
+        continue-on-error: true
+      - name: Check rsync exit code
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "rsync was successful"
+          else
+            echo "rsync failed"
+            exit 1
+          fi
       - uses: actions/checkout@v3
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
