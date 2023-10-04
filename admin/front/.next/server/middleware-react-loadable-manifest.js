@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST={"landing.js -> @/src/components/Counter":{"id":"landing.js -> @/src/components/Counter","files":["static/chunks/src_components_Counter_js.js"]}}
