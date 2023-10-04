@@ -1,4 +1,3 @@
-server
 name: Laravel Code Deployment
 
 on:
