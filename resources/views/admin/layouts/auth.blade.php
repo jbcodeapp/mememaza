@@ -34,7 +34,7 @@
   <!-- JQVMap -->
   <!--<link rel="stylesheet" href="{{ cdn('admin/plugins/jqvmap/jqvmap.min.css') }}">-->
   <!-- Theme style -->
-  <link rel="stylesheet" href="{{ cdn($path.'admin/dist/css/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ cdn($path.'admin/admin-lte/css/adminlte.min.css') }}">
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="{{ cdn($path.'admin/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
   <!-- Daterange picker -->
@@ -50,7 +50,7 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="/admin/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+    <img class="animation__shake" src="/admin/admin-lte/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
   </div>
   
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -153,11 +153,11 @@
 <!-- overlayScrollbars -->
 <script src="{{ cdn($path.'admin/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <!-- AdminLTE App -->
-<script src="{{ cdn($path.'admin/dist/js/adminlte.js') }}"></script>
+<script src="{{ cdn($path.'admin/admin-lte/js/adminlte.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
-<!--<script src="{{ cdn('admin/dist/js/demo.js') }}"></script>-->
+<!--<script src="{{ cdn('admin/admin-lte/js/demo.js') }}"></script>-->
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{ cdn($path.'admin/dist/js/pages/dashboard.js') }}"></script>
+<script src="{{ cdn($path.'admin/admin-lte/js/pages/dashboard.js') }}"></script>
 <script src="{{ cdn($path.'admin/admin.js') }}"></script>
 @stack('scripts')
 
