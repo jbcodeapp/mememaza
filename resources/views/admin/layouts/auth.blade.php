@@ -13,7 +13,7 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 	<meta name="get-url" content="{{ url('/') }}">
-	<?php $path = 'public/'; ?>
+	<?php $path = ''; ?>
     <!-- Scripts -->
 	
   <!-- Google Font: Source Sans Pro -->
@@ -50,7 +50,7 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+    <img class="animation__shake" src="/admin/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
   </div>
   
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
