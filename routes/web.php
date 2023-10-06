@@ -29,7 +29,7 @@ Route::post('/upload', [VideoUploadController::class, 'storeUploads']);
 
 Route::get('/home', [DashboardController::class, 'dashboard'])->name('home');
 Route::get('/register', [AdminController::class, 'logset']);
-Route::get('/login', [AdminController::class, 'logset']);
+Route::get('/login', [AdminController::class, 'logset'])->name('login');
 // Admin Routes
 
 Route::get('/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
