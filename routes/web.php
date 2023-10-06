@@ -29,7 +29,7 @@ Route::post('/upload', [VideoUploadController::class, 'storeUploads']);
 
 Route::get('/home', [DashboardController::class, 'dashboard'])->name('home');
 Route::get('/register', [AdminController::class, 'logset']);
-Route::get('/login', [AdminController::class, 'logset'])->name('login');
+Route::get('/login', [AdminController::class, 'logset']);
 // Admin Routes
 
 Route::get('/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
@@ -40,7 +40,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'submitResetPas
 //Route::group(['prefix' => ADMIN_PREFIX], function() {
 //Route::group(['prefix' => 'admin'], function() {
 	
-	Route::get('/', [AdminController::class, 'index']);
+	Route::get('/', [AdminController::class, 'index'])->name('login');
 	Route::post('/alogin', [AdminController::class, 'login'])->name('admin.login');
 	Route::get('/dashboard', [DashboardController::class, 'dashboard']);
 	
