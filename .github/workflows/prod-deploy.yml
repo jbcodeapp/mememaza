@@ -58,7 +58,7 @@ jobs:
           echo "Configuration cache cleared! Configuration cached successfully!"
           php artisan config:clear
           echo "Configuration cache cleared!"
-      
+
       - name: Restore Storage Files/Logs Backup
         run: sudo rsync -av --progress  /var/www/storage.temp/storage /var/www/mememaza
       - name: Delete Files/Logs Backup

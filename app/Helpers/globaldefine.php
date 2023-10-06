@@ -4,7 +4,7 @@ define('SITE_HEADING', 'Site Name');
 define('ADMIN_PREFIX', '/');
 define('IS_CASHE', false);
 define('STORE_CACHE_TIME', 43200);
-define('PUB', 'public/');
+define('PUB', '');
 define('ACTIVE', 1);
 define('IN_ACTIVE', 2);
 
