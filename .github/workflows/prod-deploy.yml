@@ -66,4 +66,4 @@ jobs:
       - name: Storage Link
         run: php artisan storage:link
       - name: Directory Permissions
-        run: sudo chmod -R 777 storage bootstrap/cache
+        run: sudo chmod -R 777 storage bootstrap/cache public
