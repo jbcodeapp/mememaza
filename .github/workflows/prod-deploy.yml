@@ -1,0 +1,69 @@
+name: Laravel Code Deployment
+
+on:
+  push:
+    branches: ["production"]
+  pull_request:
+    branches: ["production"]
+
+jobs:
+  laravel-setup:
+    runs-on: self-hosted
+
+    steps:
+      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        env:
+          runner: self-hosted
+        with:
+          php-version: "8.2"
+      - name: Permission setup
+        run: sudo chown -R $USER:$USER /var/www/actions-runner/_work/mememaza
+      - name: Storage Files/Logs Backup
+        run: sudo rsync -av --progress /var/www/mememaza/storage /var/www/storage.temp --exclude debugbar --exclude framework
+        continue-on-error: true
+      - name: Check rsync exit code
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "rsync was successful"
+          else
+            echo "rsync failed"
+            exit 1
+          fi
+      - uses: actions/checkout@v3
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Set up .env variables
+        run: |
+          echo "Copying environment variables from Github.." 
+          echo "APP_URL=https://santrash.com/" >> .env
+          echo "APP_ENV=production" >> .env
+          echo "APP_DEBUG=false" >> .env
+          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo 'DB_PASSWORD="${{ secrets.DB_PASSWORD }}"' >> .env
+          echo "Setting current date in env variable"
+          echo "APP_VERSION_UPDATED_ON=$(date +'%Y-%m-%dT%H:%M:%S')" >> .env
+          echo ".env file made"
+      - name: Composer Update
+        run: composer update
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Generate key
+        run: |
+          php artisan key:generate
+          echo "Key generated successfully!"
+          php artisan config:cache
+          echo "Configuration cache cleared! Configuration cached successfully!"
+          php artisan config:clear
+          echo "Configuration cache cleared!"
+
+      - name: Restore Storage Files/Logs Backup
+        run: sudo rsync -av --progress  /var/www/storage.temp/storage /var/www/mememaza
+      - name: Delete Files/Logs Backup
+        run: sudo rm -r  /var/www/storage.temp
+      - name: Storage Link
+        run: php artisan storage:link
+      - name: Directory Permissions
+        run: sudo chmod -R 777 storage bootstrap/cache public
