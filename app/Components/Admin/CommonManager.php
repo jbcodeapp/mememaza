@@ -102,6 +102,7 @@ class CommonManager {
 			$id = DB::table('posts')->insertGetId($params);
 			return $id;
 		}
+
 		$status = DB::table('posts')->insert($params);
 		
 		if($status)

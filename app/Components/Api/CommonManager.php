@@ -1,6 +1,9 @@
 <?php
 namespace App\Components\Api;
 use DB, stdClass, Log;
+
+use App\Models\Category;
+
 class CommonManager {
     private static $instance = null;
 	public static function getInstance() {
@@ -11,7 +14,7 @@ class CommonManager {
 	}
 	
 	public function getCategories($col = ['*']) {
-		return DB::table('categories')->select($col)->get();
+		return Category::select($col)->withCount(['reels', 'posts'])->get();
 	}
 	
 	public function getPostsLimit($page, $limit, $slug=null, $col = ['*']) {

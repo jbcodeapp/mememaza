@@ -224,7 +224,7 @@ class DashboardController extends BaseController
 			$image = '';
 			if($filename != null)
 			{
-				$path = cdn(PUB.'category/'.$id.'/'.$filename);
+				$path = cdn($filename);
 				$image = '<img src="'.$path.'" height="33" />';
 			}
 			
@@ -287,7 +287,12 @@ class DashboardController extends BaseController
 			
 			if($id > 0)
 			{
-				$params = $this->uploadImage($id, $request);
+				$params = $this->uploadImage($request, 'image', 'categories');
+				if(count($params) > 0) {
+					$obj->updateCategoryById($id, $params);
+				}
+				$params = $this->uploadImage($request, 'banner_image', 'categories');
+
 				if(count($params) > 0) {
 					$obj->updateCategoryById($id, $params);
 				}
@@ -297,38 +302,7 @@ class DashboardController extends BaseController
 			return response()->json(['status' => 'error', 'msg' => 'Please try again']);
 		}
 	}
-	
-	private function uploadImage($category_id, $request) {
-		$params = [];
-		$path = public_path('category/'.$category_id);
-		$multiImages = [];
-		
-		if(!\File::isDirectory($path)){
-			\File::makeDirectory($path, 0777, true, true);
-		}
-		
-		if($request->hasFile('banner_image'))
-		{
-			$banner_image = $request->file('banner_image');
-			$imageName = 'b'.time().'.webp';//$banner_image->extension();  
-			$image_resize = \Intervention\Image\ImageManagerStatic::make($banner_image->getRealPath())->encode('webp', 90); //->resize(870, 200)
-			if($image_resize->save($path .DIRECTORY_SEPARATOR .$imageName,80)) {
-				$params['banner_image'] = $imageName;
-			}
-		}
-		
-		if($request->hasFile('image'))
-		{
-			$image = $request->file('image');
-			$imageName = 't'.time().'.webp';//$image->extension();  
-			$image_resize = \Intervention\Image\ImageManagerStatic::make($image->getRealPath())->encode('webp', 90); //->resize(870, 200)
-			if($image_resize->save($path .DIRECTORY_SEPARATOR .$imageName,80)) {
-				$params['image'] = $imageName;
-			}
-		}
-		
-		return $params;
-	}		
+
 	
 	private function category_handle_post($request, $id, &$flag = false)
 	{

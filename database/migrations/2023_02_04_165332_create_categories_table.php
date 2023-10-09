@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
 			$table->string('name', 60);
 			$table->string('slug', 65);
-			$table->string('image', 60)->nullable();
-			$table->string('banner_image', 20)->nullable();
+			$table->string('image', 255)->nullable();
+			$table->string('banner_image', 255)->nullable();
 			$table->boolean('status')->default(1);
 			$table->timestamps();
         });

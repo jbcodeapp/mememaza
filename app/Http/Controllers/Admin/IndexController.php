@@ -99,7 +99,7 @@ class IndexController extends BaseController
 			if($record->reel_type == 1) { //link
 				
 			} else if($record->reel_type == 2) { //video
-				$src = cdn(PUB.'uploads/reel/'.$record->id.'/'.$record->link);// 
+				$src = cdn($record->link);// 
 				//$link = public_path('uploads/reel/'.$record->id.'/'.$record->link);
 				$link = '<video width="190" height="140" controls>
 				  <source src="'.$src.'" type="video/mp4">
@@ -109,7 +109,7 @@ class IndexController extends BaseController
 				$src = cdn(PUB.'uploads/reel/'.$record->thumb);
 				$thumb = '<img src="'.$src.'" height="33" />';
 			} else if($record->reel_type == 3) { //image
-				$src = cdn(PUB.'uploads/reel/'.$record->id.'/'.$record->link);
+				$src = cdn($record->link);
 				$image = '<img src="'.$src.'" height="133" />';
 				$link = $image;
 			}
@@ -177,8 +177,8 @@ class IndexController extends BaseController
 			try{
 				$flag = false;
 				DB::beginTransaction();
+
 				if($id > 0) {
-					
 					if($request->reel_type == 1) {
 						
 						$status = $commonManagerObj->updateReelById($id, ['category_id' => $request->category_id, 'reel' => $request->name, 'link' => $request->videolink, 'reel_type' => $request->reel_type]);
@@ -191,7 +191,7 @@ class IndexController extends BaseController
 						
 						if($request->hasFile('video') && $statuschk == true) {
 							
-							$status = $this->uploadVideo($id, $request);
+							$status = $this->uploadRemoteVideo($id, $request);
 							if($status === true) {
 								$flag = true;
 							}
@@ -201,26 +201,23 @@ class IndexController extends BaseController
 							}
 						}
 					}
-					
 				} else {
-					
-					
-					if($request->reel_type == 1) { //link
+					if($request->reel_type == 1) { // link
 						
 						$status = $commonManagerObj->insert_reel(['reel' => $request->name, 'category_id' => $request->category_id, 'link' => $request->videolink, 'reel_type' => 1]);
 						if($status) {
 							$flag = true;
 						}
 						
-					} else if($request->reel_type == 2) { //video
+					} else if($request->reel_type == 2) { // video
 						$id = $commonManagerObj->insert_reel(['category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 2], true);
 						if($id) {
-							$status = $this->uploadVideo($id, $request);
+							$status = $this->uploadRemoteVideo($id, $request);
 							if($status === true) {
 								$flag = true;
 							}
 						}
-					} else if($request->reel_type == 3) { //video
+					} else if($request->reel_type == 3) { // image
 						$id = $commonManagerObj->insert_reel(['category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 3], true);
 						if($id) {
 							$status = $this->uploadReelImage($id, $request);
@@ -272,101 +269,38 @@ class IndexController extends BaseController
 	
 	private function uploadReelImage($id, $request) {
 		$commonManagerObj = CommonManager::getInstance();
-		$params = [];
 		$flag = false;
 
-		if($request->hasFile('image')) {
-			$image = $request->file('image');
-			$path = public_path('uploads/reel/'.$id);
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			
-			$image = $request->file('image');
-				
-			$original_name = strtolower(trim($image->getClientOriginalName()));
-			$file_name = 'image_'.time().rand(100,999).$original_name;
-			//$path = 'uploads/reel/'.$id;
-			if($image->move($path,$file_name)) {
-				$params['link'] = $file_name;
-				$flag = true;
-				
-			}
+		$params = $this->uploadImage($request, 'image', 'reels');
 
-		}	
-		if(count($params) > 0 && $flag == true) {
+		if(count($params) > 0) {
 			$status = $commonManagerObj->updateReelById($id, $params);
 			if($status) {
 				return true;
 			}
 		}
 		return false;
-		
 	}
 	
-	private function uploadVideo($id, $request) {
+	private function uploadRemoteVideo($id, $request) {
 		$commonManagerObj = CommonManager::getInstance();
 		$params = [];
-		$flag = false;
-		if($request->hasFile('video')) {
-			$video = $request->file('video');
-			$path = public_path('uploads/reel/'.$id);
-			$multiImages = [];
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			
-			$video = $request->file('video');
-				
-			$original_name = strtolower(trim($video->getClientOriginalName()));
-			$file_name = time().rand(100,999).$original_name;
-			//$path = 'uploads/reel/'.$id.'/';
-			if($video->move($path,$file_name)) {
-				$path = 'uploads/reel/'.$id.'/';
-				$inputAudio = public_path($path.$file_name);
-				$outputAudio = public_path($path.'/vdo.mp4');
-				exec("ffmpeg -i $inputAudio -ab 32 -ss 00:00:00 -t 00:00:28 $outputAudio");
-				//exec("ffmpeg -i $inputAudio -ab 64 $outputAudio");
-				//return false;
-					//exec("ffmpeg -i $inputAudio -vcodec libx265 -crf 28 $outputAudio");
-				$params['link'] = 'vdo.mp4';
-				$status = $commonManagerObj->updateReelById($id, $params);
-				if($status) {
-					$flag = true;
-				}
-			}
+
+		$paramsVideo = $this->uploadVideo($request, 'video', 'reels');
+		$paramsImage = $this->uploadImage($request, 'thumb', 'reels');
+
+		if(count($paramsVideo) > 0 && count($paramsImage) > 0) {
+			$params = ['link' => $paramsVideo['video'], 'thumb' => $paramsImage['thumb']];
 		}
 
-		if($request->hasFile('thumb')) {
-			$image = $request->file('thumb');
-			$path = public_path('uploads/reel/'.$id);
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			
-			$image = $request->file('thumb');
-				
-			$original_name = strtolower(trim($image->getClientOriginalName()));
-			$file_name = 'thumb_'.time().rand(100,999).$original_name;
-			//$path = 'uploads/reel/'.$id;
-			if($image->move($path,$file_name)) {
-				$params['thumb'] = $file_name;
-				$flag = true;
-				
-			}
-
-		}	
-		if(count($params) > 0 && $flag == true) {
+		if(count($params) > 0) {
 			$status = $commonManagerObj->updateReelById($id, $params);
 			if($status) {
 				return true;
 			}
 		}
+
 		return false;
-		
 	}
 	
 	
@@ -438,7 +372,7 @@ class IndexController extends BaseController
 			$id = $record->id;
 			$image = '';
 			if($record->image != null) {
-				$src = cdn(PUB.'uploads/post/'.$record->image);
+				$src = cdn($record->image);
 				$image = '<img src="'.$src.'" height="33" />';
 			}
 			
@@ -533,26 +467,7 @@ class IndexController extends BaseController
 	}
 	
 	private function uploadPostImage($request) {
-		if($request->hasFile('img'))
-		{
-			$path = public_path('uploads/post/');
-			$multiImages = [];
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			
-			$img = $request->file('img');
-			
-			$imageName = time().rand(100,999).'.webp';
-			$image_resize = \Intervention\Image\ImageManagerStatic::make($img->getRealPath())->encode('webp', 90); //->resize(870, 200)
-			if($image_resize->save($path .DIRECTORY_SEPARATOR .$imageName,80)) {
-				return $imageName;
-			}
-		
-		}
-		return false;
-		
+		return $this->uploadImage($request, 'img', 'posts')['img'];
 	}
 	/* Post End */
 	
@@ -624,7 +539,7 @@ class IndexController extends BaseController
 			$id = $record->id;
 			$image = '';
 			if($record->banner != null) {
-				$src = cdn(PUB.'uploads/banner/'.$record->banner);
+				$src = cdn($record->banner);
 				$image = '<img src="'.$src.'" height="33" />';
 			}
 			
@@ -715,25 +630,7 @@ class IndexController extends BaseController
 	}
 	
 	private function uploadBannerImage($request) {
-		if($request->hasFile('banner'))
-		{
-			$path = public_path('uploads/banner/');
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			
-			$img = $request->file('banner');
-			
-			$imageName = time().rand(100,999).'.webp';
-			$image_resize = \Intervention\Image\ImageManagerStatic::make($img->getRealPath())->encode('webp', 90); //->resize(870, 200)
-			if($image_resize->save($path .DIRECTORY_SEPARATOR .$imageName,80)) {
-				return $imageName;
-			}
-		
-		}
-		return false;
-		
+		return $this->uploadImage($request, 'banner', 'banners')['banner'];
 	}
 	/* Banner End */
 	
@@ -809,12 +706,12 @@ class IndexController extends BaseController
 				$story_type = 'Image';
 				if($record->story != null) {
 					
-					$src = cdn(PUB.'uploads/story/'.$record->id.'/'.$record->story);
+					$src = cdn($record->story);
 					$story = '<a href="'.$record->link.'" target="_blank"><img src="'.$src.'" height="50" /></a>';
 				}
 			} else if($record->story_type == 2) {
 				$story_type = 'Video';
-				$src = cdn(PUB.'uploads/story/'.$record->id.'/'.$record->story);
+				$src = cdn($record->story);
 				$story = '<video width="130" height="100" controls>
 				  <source src="'.$src.'" type="video/mp4">
 				  Sorry, your browser doesn t support the video element.
@@ -955,64 +852,30 @@ class IndexController extends BaseController
 	}
 	
 	private function uploadStoryImage($request, $id) {
-		if($request->hasFile('story'))
-		{
-			$path = public_path('uploads/story/'.$id.'/');
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
+		$params = $this->uploadImage($request, 'story', 'stories');
+
+		if(count($params) > 0) {
+			$commonManagerObj = CommonManager::getInstance();
+			$status = $commonManagerObj->updateStoryById($id, ['story' => $params['story']]);
+			if($status) {
+				return true;
 			}
-			
-			$story = $request->file('story');
-			
-			$imageName = time().rand(100,999).'.webp';
-			$image_resize = \Intervention\Image\ImageManagerStatic::make($story->getRealPath())->encode('webp', 90); //->resize(870, 200)
-			if($image_resize->save($path .DIRECTORY_SEPARATOR .$imageName,80)) {
-				
-				$commonManagerObj = CommonManager::getInstance();
-				$status = $commonManagerObj->updateStoryById($id, ['story' => $imageName]);
-				if($status) {
-					return true;
-				}
-			}
-		
-		
 		}
 		return false;
-		
 	}
 	
 	private function uploadStoryVideo($request, $id) {
-		if($request->hasFile('story'))
-		{
-			$path = public_path('uploads/story/'.$id.'/');
-			
-			if(!\File::isDirectory($path)){
-				\File::makeDirectory($path, 0777, true, true);
+		$params = $this->uploadVideo($request, 'story', "stories", true);
+
+		if(count($params) > 0) {
+			$commonManagerObj = CommonManager::getInstance();
+			$status = $commonManagerObj->updateStoryById($id, ['story' => $params['story']]);
+
+			if($status) {
+				return true;
 			}
-			
-			$story = $request->file('story');
-				
-			$original_name = strtolower(trim($story->getClientOriginalName()));
-			$file_name = time().rand(100,999).$original_name;
-			
-			if($story->move($path,$file_name)) {
-				$path = 'uploads/story/'.$id.'/';
-				$inputVideo = public_path($path.$file_name);
-				$outputVideo = public_path($path.'/vdo.mp4');
-				//exec("ffmpeg -i $inputAudio -ab 64 -ss 00:00:00 -t 00:00:08 $outputAudio");
-				//exec("ffmpeg -i $inputVideo -ab 64 $outputVideo");
-				exec("ffmpeg -i $inputVideo -b 3000000 $outputVideo");
-				
-				$commonManagerObj = CommonManager::getInstance();
-				$status = $commonManagerObj->updateStoryById($id, ['story' => 'vdo.mp4']);
-				if($status) {
-					unlink($inputVideo);
-					return true;
-				}
-			}
-		
 		}
+		
 		return false;
 		
 	}

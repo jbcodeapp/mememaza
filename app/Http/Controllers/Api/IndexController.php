@@ -16,35 +16,33 @@ class IndexController extends Controller
     public function index(Request $request, $slug=null) {
 		$userid = null;
 		if (Auth()->guard('api')->check()) {
-			  $userid =  auth('api')->user()->id;
+			$userid =  auth('api')->user()->id;
 		}
 		$obj = CommonManager::getInstance();
 		$page = ($request->page > 0) ?  $request->page : 1;
-		$limit = 3;
+		$limit = 10;
 		
-		$path=cdn(PUB."uploads/post");
+		$path=cdn('');
 		$postcol = [
-				'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '/","",posts.image) as image_path'),
+				'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '","",posts.image) as image_path'),
 				'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
 				];
 		
 		$path=cdn(PUB."story/");
 		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
-		$categories = DB::table('stories')->select(['id', 'story', 'link', 'story_type'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
-		foreach($categories as $category) {
-			//if($category->story_type ) { }
-			$category->image_path = cdn(PUB.'uploads/story/'.$category->id.'/'.$category->story);
+		$stories = DB::table('stories')->select(['id', 'story', 'link', 'story_type'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
+		foreach($stories as $story) {
+			$story->image_path = cdn($story->story);
 		}
 		
-		/* $categories = $obj->getCategories(['id', 'name', 'slug', 'image']);
+		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image']);
 		foreach($categories as $category) {
-			$category->image_path = cdn(PUB.'category/'.$category->id.'/'.$category->image);
-		} */
+			$category->image_path = cdn($category->image);
+		} 
 		$post = $this->postData($page, $limit, $slug, $postcol);
 		
 		$postlist  = $post['data'];
 		foreach($post['data'] as $postobj) {
-			
 			//$this->generateSlug($postobj->id, $postobj->title);
 			
 			$postobj->likestatus = 0;
@@ -60,10 +58,10 @@ class IndexController extends Controller
 			$reelspath=$reel->link;
 			$thumb = '';
 			if($reel->reel_type == 2) {
-				$reelspath=cdn(PUB."uploads/reel/".$reel->id.'/'.$reel->link);
-				$thumb = cdn(PUB."uploads/reel/".$reel->id.'/'.$reel->thumb);
+				$reelspath=cdn($reel->link);
+				$thumb = cdn($reel->thumb);
 			} else if($reel->reel_type == 3) {
-				$reelspath=cdn(PUB."uploads/reel/".$reel->id.'/'.$reel->link);
+				$reelspath=cdn($reel->link);
 			}
 			$reelsData[] = [
 							'id' => $reel->id,
@@ -73,10 +71,10 @@ class IndexController extends Controller
 							'thumb' => $thumb
 							];
 		}
-		 
+
 		return response()->json(['statuscode'=>true, 'userid' => $userid,
 		'page' => $page, 'slug' => $slug, 'postcount' => $post['count'],
-		'categories' => $categories, 'post' => $postlist, 'reels' => $reelsData], 200);
+		'stories' => $stories, 'categories' => $categories, 'post' => $postlist, 'reels' => $reelsData], 200);
 	}
 
 	/* public function post(Request $request, $slug=null) {

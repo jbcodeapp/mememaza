@@ -72,7 +72,6 @@ $(function () {
 		  "info": true,
 		  "autoWidth": false,
 		  "responsive": true,
-		  
 		  'processing': true,
 		  'serverSide': true,
 		  "ajax": {

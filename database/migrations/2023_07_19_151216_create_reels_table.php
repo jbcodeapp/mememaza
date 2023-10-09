@@ -18,7 +18,7 @@ return new class extends Migration
 			$table->string('reel', 180);
 			$table->boolean('reel_type')->default(1)->comment('1:video link, 2:upload video');
 			$table->boolean('status')->default(1);
-			$table->string('link');
+			$table->string('link')->nullable();
             $table->timestamps();
         });
     }
