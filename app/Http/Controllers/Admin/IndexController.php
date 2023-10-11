@@ -152,6 +152,9 @@ class IndexController extends BaseController
 			$id = ($request->id > 0) ? $request->id : 0;
 			$rules = array(
 				'name' => 'required',
+				'meta_title' => 'required',
+				'meta_keyword' => 'required',
+				'meta_desc' => 'required',
 				'category_id' => 'required',
 				'reel_type' => 'required'
 			);
@@ -203,14 +206,15 @@ class IndexController extends BaseController
 					}
 				} else {
 					if($request->reel_type == 1) { // link
-						
-						$status = $commonManagerObj->insert_reel(['reel' => $request->name, 'category_id' => $request->category_id, 'link' => $request->videolink, 'reel_type' => 1]);
+						$slug = $this->generateReelSlug($request->name);
+						$status = $commonManagerObj->insert_reel(['slug' => $slug, 'meta_desc' => $request->meta_desc, 'meta_keyword' => $request->meta_keyword, 'meta_title' => $request->meta_title, 'reel' => $request->name, 'category_id' => $request->category_id, 'link' => $request->videolink, 'reel_type' => 1]);
 						if($status) {
 							$flag = true;
 						}
 						
 					} else if($request->reel_type == 2) { // video
-						$id = $commonManagerObj->insert_reel(['category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 2], true);
+						$slug = $this->generateReelSlug($request->name);
+						$id = $commonManagerObj->insert_reel(['slug' => $slug, 'meta_desc' => $request->meta_desc, 'meta_keyword' => $request->meta_keyword, 'meta_title' => $request->meta_title, 'category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 2], true);
 						if($id) {
 							$status = $this->uploadRemoteVideo($id, $request);
 							if($status === true) {
@@ -218,7 +222,8 @@ class IndexController extends BaseController
 							}
 						}
 					} else if($request->reel_type == 3) { // image
-						$id = $commonManagerObj->insert_reel(['category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 3], true);
+						$slug = $this->generateReelSlug($request->name);
+						$id = $commonManagerObj->insert_reel(['slug' => $slug, 'meta_desc' => $request->meta_desc, 'meta_keyword' => $request->meta_keyword, 'meta_title' => $request->meta_title, 'category_id' => $request->category_id, 'reel' => $request->name, 'reel_type' => 3], true);
 						if($id) {
 							$status = $this->uploadReelImage($id, $request);
 							if($status === true) {
@@ -266,6 +271,16 @@ class IndexController extends BaseController
 			
 		}
 	}
+	
+	private function generateReelSlug($name) {
+		$slug = Str::slug($name);
+		$count = DB::table('reels')->where('slug', $name)->count();
+		if($count > 0) {
+			return $slug.$count;
+		}
+		return $slug;
+	}
+	
 	
 	private function uploadReelImage($id, $request) {
 		$commonManagerObj = CommonManager::getInstance();
@@ -410,6 +425,9 @@ class IndexController extends BaseController
 			$rules = array(
 				'title' => 'required',
 				'category_id' => 'required',
+				'meta_title' => 'required',
+				'meta_keyword' => 'required',
+				'meta_desc' => 'required',
 				'img' => 'required|mimes:jpeg,jpg,png,gif,webp|max:10000',
 				'desc' => 'required'
 			);
@@ -423,7 +441,8 @@ class IndexController extends BaseController
 				return response()->json(['status' => 'errors', 'errors' => $validator->getMessageBag()->toArray()]);
 			}
 			
-			$params = ['title' => $request->title, 'desc' => $request->desc, 'category_id' => $request->category_id, 'status' => 1];
+			$params = ['title' => $request->title, 'desc' => $request->desc, 'category_id' => $request->category_id, 'status' => 1,
+			'meta_title' => $request->meta_title, 'meta_keyword' => $request->meta_keyword, 'meta_desc' => $request->meta_desc];
 			
 			if($id > 0) {
 				if($request->hasFile('img'))
@@ -574,7 +593,10 @@ class IndexController extends BaseController
 			$id = ($request->id > 0) ? $request->id : 0;
 			$rules = array(
 				'banner' => 'required|mimes:jpeg,jpg,png,gif,webp|max:10000',
-				'position' => 'required'
+				'position' => 'required',
+				'meta_title' => 'required',
+				'meta_keyword' => 'required',
+				'meta_desc' => 'required',
 			);
 			
 			if($id > 0) {
@@ -586,7 +608,7 @@ class IndexController extends BaseController
 				return response()->json(['status' => 'errors', 'errors' => $validator->getMessageBag()->toArray()]);
 			}
 			
-			$params = ['position' => $request->position, 'status' => 1];
+			$params = ['meta_desc' => $request->meta_desc, 'meta_keyword' => $request->meta_keyword, 'meta_title' => $request->meta_title, 'position' => $request->position, 'status' => 1];
 			
 			if($id > 0) {
 				if($request->hasFile('banner'))

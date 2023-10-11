@@ -174,4 +174,13 @@ class IndexController extends Controller
 		$data = $list;
 		return response()->json(['nextpage' => $nextpage, 'comments' => $data]);
 	}
+	
+	public function postbyslug(Request $request, $slug) {
+		
+		return response()->json(['obj' => DB::table('posts')->where('slug', $slug)->first()]);
+	}
+	
+	public function reelbyslug(Request $request, $slug) {
+		return response()->json(['obj' => DB::table('reels')->where('slug', $slug)->first()]);
+	}
 }

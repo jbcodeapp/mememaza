@@ -78,6 +78,26 @@
 						  </div>
 						</div>
 						
+						<div class="col-12">
+							<div class="form-group">
+								<label for="exampleInputEmail1">meta title</label>
+								<input type="text" class="form-control meta_title" name="meta_title" value="{{ $obj->meta_title??null }}" placeholder="Enter meta title">
+							</div>
+						</div>
+						
+						<div class="col-12">
+							<div class="form-group">
+								<label for="exampleInputEmail1">meta keyword</label>
+								<input type="text" class="form-control meta_keyword" name="meta_keyword" value="{{ $obj->meta_keyword??null }}" placeholder="Enter meta keyword">
+							</div>
+						</div>
+						
+						<div class="col-12">
+							<div class="form-group">
+								<label for="exampleInputEmail1">meta desc</label>
+								<input type="text" class="form-control meta_desc" name="meta_desc" value="{{ $obj->meta_desc??null }}" placeholder="Enter meta desc">
+							</div>
+						</div>
 						
 						
 						  
