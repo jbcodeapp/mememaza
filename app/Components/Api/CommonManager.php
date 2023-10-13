@@ -26,7 +26,7 @@ class CommonManager {
 					->join('categories', 'categories.id', '=', 'posts.category_id');
 		
 		if($slug != null) {
-			$data->where('categories.slug', $slug);
+			$data->where('posts.slug', $slug);
 		}
 		
 		//$count = $data->count();
