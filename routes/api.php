@@ -24,8 +24,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('login',[LoginController::class,'login']);
 Route::post('register',[LoginController::class,'register']);
 
-Route::get('postbyslug/{slug?}',[IndexController::class,'postbyslug']);
-Route::get('reelbyslug/{slug?}',[IndexController::class,'reelbyslug']);
+Route::get('getpostbyslug/{slug?}',[IndexController::class,'postbyslug']); 
+Route::get('getreelbyslug/{slug?}',[IndexController::class,'reelbyslug']);
+
+Route::get('postdownload/{slug?}',[IndexController::class,'postdownload']);
+Route::get('postshare/{slug?}',[IndexController::class,'postshare']);
+Route::get('postview/{slug?}',[IndexController::class,'postview']);
+Route::get('postlike/{slug?}',[IndexController::class,'postlike']);
+Route::get('postcomment/{slug?}',[IndexController::class,'postcomment']);
+
+Route::post('updatedownload',[IndexController::class,'updatedownload']);
+Route::post('updateshare',[IndexController::class,'updateshare']);
+Route::post('updatelike',[IndexController::class,'updatelike']);
+Route::post('updatedislike',[IndexController::class,'updatedislike']);
+
 
 Route::get('post/{slug?}',[IndexController::class,'index']);
 Route::get('search/{search}',[IndexController::class,'search']);
@@ -36,5 +48,6 @@ Route::get('detail/{id}',[IndexController::class,'detail']);
 Route::middleware(['auth:api'])->group(function(){
 	//Route::get('post/{slug?}',[IndexController::class,'index']);
 	Route::post('comment',[AuthController::class,'comment']);
+	Route::post('deletecomment',[AuthController::class,'deletecomment']);
 	Route::post('logout',[LoginController::class,'logout']);
 });

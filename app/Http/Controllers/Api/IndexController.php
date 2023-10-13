@@ -183,4 +183,69 @@ class IndexController extends Controller
 	public function reelbyslug(Request $request, $slug) {
 		return response()->json(['obj' => DB::table('reels')->where('slug', $slug)->first()]);
 	}
+	
+	public function postdownload(Request $request, $slug) {
+		
+		return response()->json(['download' => DB::table('posts')->select('download')->where('slug', $slug)->first()->download]);
+	}
+	
+	public function postshare(Request $request, $slug) {
+		return response()->json(['share' => DB::table('posts')->select('share')->where('slug', $slug)->first()->share]);
+	}
+	
+	public function postview(Request $request, $slug) {
+		return response()->json(['view' => DB::table('posts')->select('view')->where('slug', $slug)->first()->view]);
+	}
+	
+	public function postlike(Request $request, $slug) {
+		return response()->json(['like' => DB::table('posts')->select('like')->where('slug', $slug)->first()->like]);
+	}
+	
+	public function postcomment(Request $request, $slug) {
+		return response()->json(['comment' => DB::table('posts')->select('comment')->where('slug', $slug)->first()->comment]);
+	}
+	
+	public function updatedownload(Request $request) {
+		$postid = $request->id;
+		$post = DB::table('posts')->select('download')->whereid($postid);
+		if($post->first() == null) {
+			return response()->json(['status' => 'error', 'message' => 'Post not found']);
+		}
+		$post->increment('download');
+		return response()->json(['status' => 'success', 'download' => $post->first()->download]);
+	}
+	
+	public function updateshare(Request $request) {
+		$postid = $request->id;
+		$post = DB::table('posts')->select('share')->whereid($postid);
+		if($post->first() == null) {
+			return response()->json(['status' => 'error', 'message' => 'Post not found']);
+		}
+		$post->increment('share');
+		return response()->json(['status' => 'success', 'share' => $post->first()->share]);
+	}
+	
+	public function updatelike(Request $request) {
+		$postid = $request->id;
+		$post = DB::table('posts')->select('like')->whereid($postid);
+		if($post->first() == null) {
+			return response()->json(['status' => 'error', 'message' => 'Post not found']);
+		}
+		$post->increment('like');
+		return response()->json(['status' => 'success', 'like' => $post->first()->like]);
+	}
+	
+	public function updatedislike(Request $request) {
+		$postid = $request->id;
+		$post = DB::table('posts')->select('like')->whereid($postid);
+		if($post->first() == null) {
+			return response()->json(['status' => 'error', 'message' => 'Post not found']);
+		} else {
+			if($post->first()->like == 0) {
+				return response()->json(['status' => 'success', 'like' => 0]);
+			}
+		}
+		$post->decrement('like');
+		return response()->json(['status' => 'success', 'like' => $post->first()->like]);
+	}
 }

@@ -43,8 +43,34 @@ class AuthController extends Controller
 			if(DB::table('comments')->insert(['type_id' => $post->id, 'user_id' => $user->id , 'type' => 1, 'comment' => $comment])) {
 				if(DB::table('posts')->where('id', $post->id)->increment('comment')) {
 					$post->comment++;
-					$post->comments = DB::table('comments')->select(['*'])->where('type_id', $post->id)->where('type', 1)->orderBy('id', 'desc')->limit($limit)->offset(1 * $limit)->get()->toArray(); //$obj->getPostCommentByAttr($post->id, 1);
+					$post->comments = DB::table('comments')->select(['comments.*', 'users.name'])
+					->join('users', 'users.id', '=', 'comments.user_id')->where('comments.type_id', $post->id)->where('comments.type', 1)->orderBy('comments.id', 'desc')->limit($limit)->offset(0)->get()->toArray(); //$obj->getPostCommentByAttr($post->id, 1);
 					return response()->json(['statuscode' => true, 'post' => $post]);
+				}
+			}
+		}
+		return response()->json(['statuscode' => false]);
+		
+	}
+	
+	public function deletecomment(Request $request) {
+		$user = auth()->user();
+		
+		//sleep(3);
+		$comment = DB::table('comments')->where('id', $request->comment_id)->where('user_id', $user->id)->first();
+		if($comment) {
+			$postid = $comment->type_id;
+			$obj = CommonManager::getInstance();
+			$post = $obj->getPostById($postid, ['id', 'like', 'share', 'view', 'comment']);
+			$limit = 100;
+			if($post) {
+				if(DB::table('comments')->where('id', $comment->id)->delete()) {
+					if(DB::table('posts')->where('id', $post->id)->decrement('comment')) {
+						$post->comment--;
+						$post->comments = DB::table('comments')->select(['comments.*', 'users.name'])
+						->join('users', 'users.id', '=', 'comments.user_id')->where('comments.type_id', $post->id)->where('comments.type', 1)->orderBy('comments.id', 'desc')->limit($limit)->offset(0)->get()->toArray(); //$obj->getPostCommentByAttr($post->id, 1);
+						return response()->json(['statuscode' => true, 'post' => $post]);
+					}
 				}
 			}
 		}

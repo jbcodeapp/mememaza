@@ -79,6 +79,7 @@ class Controller extends BaseController
             if($file->move($path, $file_name_extension)) {
                 if($isStory) {
                     exec("ffmpeg -i $filePath -b 3000000 $croppedFilePath");
+					//vdo_image
                 } else {
                     exec("ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:28 $croppedFilePath");
                 }

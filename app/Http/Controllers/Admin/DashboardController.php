@@ -259,7 +259,10 @@ class DashboardController extends BaseController
 		{
 			$id = ($request->id > 0) ? $request->id : 0;
 			$rules = array(
-				'name' => 'required|unique:categories'
+				'name' => 'required|unique:categories',
+				'meta_title' => 'required',
+				'meta_keyword' => 'required',
+				'meta_desc' => 'required',
 			);
 			if($id > 0) {
 				$rules = array(
@@ -308,8 +311,16 @@ class DashboardController extends BaseController
 	{
 		$params = [];
 		$params['name'] = $request->name;
+		$params['meta_title'] = $request->meta_title;
+		$params['meta_keyword'] = $request->meta_keyword;
+		$params['meta_desc'] = $request->meta_desc;
 		if($id == 0) {
-			$params['slug'] = \Str::slug($params['name'], '-');
+			$slug = \Str::slug($params['name'], '-');
+			$count = DB::table('categories')->where('slug', $slug)->count();
+			if($count > 0) {
+				$slug = $slug.$count;
+			}
+			$params['slug'] = $slug;
 		}
 		
 		$params['status'] = 1;

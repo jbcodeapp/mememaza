@@ -116,18 +116,6 @@
 						  </div>
 						</div>
 						
-						 <div class="col-12 upthumb d-none">
-						  <div class="form-group ">
-							<label for="exampleInputFile">Upload Thumb</label>
-							<div class="input-group thumb">
-							  <div class="custom-file">
-								<input type="file" class="custom-file-input " name="thumb">
-								<label class="custom-file-label" for="exampleInputFile">Choose file</label>
-							  </div>
-							</div>
-							
-						  </div>
-						</div>
 						
 						<div class="col-12 upimage d-none">
 						  <div class="form-group ">

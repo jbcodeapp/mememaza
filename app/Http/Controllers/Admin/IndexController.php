@@ -164,7 +164,7 @@ class IndexController extends BaseController
 			} else if($request->reel_type == 2) { //video
 				//if($request->hasFile('video')) {
 					$rules['video'] = 'required|mimes:mp4,ogx,oga,ogv,ogg,webm|max:20000';
-					$rules['thumb'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
+					//$rules['thumb'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
 				//}
 				
 			} else if($request->reel_type == 3) { //image
@@ -886,8 +886,61 @@ class IndexController extends BaseController
 		return false;
 	}
 	
+	/* private function uploadStoryVideo($request, $id) {
+		if($request->hasFile('story'))
+		{
+			$path = public_path('uploads/story/'.$id.'/');
+			
+			if(!\File::isDirectory($path)){
+				\File::makeDirectory($path, 0777, true, true);
+			}
+			
+			$story = $request->file('story');
+				
+			$original_name = strtolower(trim($story->getClientOriginalName()));
+			$file_name = time().rand(100,999).$original_name;
+			
+			if($story->move($path,$file_name)) {
+				$path = 'uploads/story/'.$id.'/';
+				$inputVideo = public_path($path.$file_name);
+				$outputVideo = public_path($path.'/vdo.mp4');
+				$outputImgVideo = public_path($path.'/gif_anime.gif');
+				//exec("ffmpeg -i $inputAudio -ab 64 -ss 00:00:00 -t 00:00:08 $outputAudio");
+				//exec("ffmpeg -i $inputVideo -ab 64 $outputVideo");
+				//exec("ffmpeg -i $inputVideo -b 3000000 $outputVideo");
+				
+				// Use shell_exec() to run the ffmpeg command to compress the video
+				$command = "ffmpeg -i $inputVideo -vf scale=640:-1 -c:v libx264 -crf 20 $outputVideo";
+				$output = shell_exec($command);
+				
+				$command = "ffmpeg -i $inputVideo -ab 32 -ss 00:00:00 -t 00:00:3 $outputImgVideo";
+				$output = shell_exec($command);
+				//system($command);
+				
+				$commonManagerObj = CommonManager::getInstance();
+				$status = $commonManagerObj->updateStoryById($id, ['story' => 'vdo.mp4', 'vdo_image' => 'gif_anime.gif']);
+				if($status) {
+					unlink($inputVideo);
+					return true;
+				}
+			}
+		
+		}
+		return false;
+		
+	} */
+	
 	private function uploadStoryVideo($request, $id) {
 		$params = $this->uploadVideo($request, 'story', "stories", true);
+
+		/* 
+		$outputImgVideo = public_path($path.'/gif_anime.gif');
+		$command = "ffmpeg -i $inputVideo -ab 32 -ss 00:00:00 -t 00:00:3 $outputImgVideo";
+		$output = shell_exec($command); 
+		$status = $commonManagerObj->updateStoryById($id, ['story' => 'vdo.mp4', 'vdo_image' => 'gif_anime.gif']);
+				
+		*/
+		//system($command);
 
 		if(count($params) > 0) {
 			$commonManagerObj = CommonManager::getInstance();
