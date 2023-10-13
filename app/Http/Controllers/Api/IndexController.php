@@ -12,7 +12,15 @@ class IndexController extends Controller
 		$slug = Str::slug($title);
 		DB::table('posts')->where('id', $id)->update(['slug' => $slug]);
 	} */
-	
+	public function stories() {
+		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
+		$stories = DB::table('stories')->select(['id', 'story', 'link', 'story_type', 'created_at'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
+		foreach($stories as $story) {
+			$story->image_path = cdn($story->story);
+		}
+		
+		return response()->json(['statuscode'=>true, 'stories' => $stories], 200);
+	}
     public function index(Request $request, $slug=null) {
 		$userid = null;
 		if (Auth()->guard('api')->check()) {
@@ -24,18 +32,18 @@ class IndexController extends Controller
 		
 		$path=cdn('');
 		$postcol = [
-				'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '","",posts.image) as image_path'),
+				'posts.id', 'categories.name as category', 'posts.desc', 'posts.slug', 'posts.title', 'posts.created_at', DB::raw('CONCAT("' . $path . '","",posts.image) as image_path'),
 				'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
 				];
 		
 		$path=cdn(PUB."story/");
 		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
-		$stories = DB::table('stories')->select(['id', 'story', 'link', 'story_type'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
+		/* $stories = DB::table('stories')->select(['id', 'story', 'link', 'story_type', 'created_at'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
 		foreach($stories as $story) {
 			$story->image_path = cdn($story->story);
-		}
+		} */
 		
-		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image']);
+		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image', 'categories.created_at']);
 		foreach($categories as $category) {
 			$category->image_path = cdn($category->image);
 		} 
@@ -51,7 +59,7 @@ class IndexController extends Controller
 			}
 		}
 		
-		$reels = DB::table('reels')->select(['id', 'reel', 'link', 'thumb', 'reel_type'])->where('status', 1)->orderBy('id', 'desc')->get();
+		$reels = DB::table('reels')->select(['id', 'slug', 'reel', 'link', 'thumb', 'reel_type', 'created_at'])->where('status', 1)->orderBy('id', 'desc')->get();
 		$reelsData = [];
 		
 		foreach($reels as $reel) {
@@ -68,13 +76,15 @@ class IndexController extends Controller
 							'reel_type' => $reel->reel_type,
 							'name' => $reel->reel,
 							'link' => $reelspath,
-							'thumb' => $thumb
+							'thumb' => $thumb,
+							'slug' => $reel->slug,
+							'created_at' => $reel->created_at
 							];
 		}
 
 		return response()->json(['statuscode'=>true, 'userid' => $userid,
 		'page' => $page, 'slug' => $slug, 'postcount' => $post['count'],
-		'stories' => $stories, 'categories' => $categories, 'post' => $postlist, 'reels' => $reelsData], 200);
+		'categories' => $categories, 'post' => $postlist, 'reels' => $reelsData], 200);
 	}
 
 	/* public function post(Request $request, $slug=null) {

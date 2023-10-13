@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('login',[LoginController::class,'login']);
 Route::post('register',[LoginController::class,'register']);
-
+Route::get('stories',[IndexController::class,'stories']);
 Route::get('getpostbyslug/{slug?}',[IndexController::class,'postbyslug']); 
 Route::get('getreelbyslug/{slug?}',[IndexController::class,'reelbyslug']);
 
