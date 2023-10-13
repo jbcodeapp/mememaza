@@ -10,6 +10,7 @@ dist/
 .env
 
 vendor
+storage
 
 # Compiled Java class files
 *.class
