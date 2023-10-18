@@ -4,6 +4,8 @@ use DB, stdClass, Log;
 
 use App\Models\Category;
 
+use App\Models\Post;
+
 class CommonManager {
     private static $instance = null;
 	public static function getInstance() {
@@ -17,25 +19,25 @@ class CommonManager {
 		return Category::select($col)->withCount(['reels', 'posts'])->get();
 	}
 	
-	public function getPostsLimit($page, $limit, $slug=null, $col = ['*']) {
-		
-		$data = DB::table('posts')
-					->select($col)
-					->where('categories.status', 1)
-					->where('posts.status', 1)
-					->join('categories', 'categories.id', '=', 'posts.category_id');
-		
-		if($slug != null) {
-			$data->where('posts.slug', $slug);
+	public function getPostsLimit($page, $limit, $slug = null) {
+		// Create a base query using the Post model
+		$query = Post::select(['*'])
+			->withCount('likes', 'comments', 'shares', 'views')
+			->whereHas('category', function ($query) {
+				$query->where('status', 1);
+			})
+			->where('status', 1);
+	
+		// Apply slug filter if provided
+		if ($slug !== null) {
+			$query->where('slug', $slug);
 		}
-		
-		//$count = $data->count();
-		
-		$data->limit($limit)->offset(($page - 1) * $limit);
-		
-		$list = $data->orderBy('posts.id', 'ASC')->get();
-		
-		return ['count' => $list->count(), 'data' => $list];
+	
+		// Paginate the results
+		$list = $query->orderBy('id', 'asc')
+			->paginate($limit, ['*'], 'page', $page);
+	
+		return ['count' => $list->count(), 'data' => $list->items()];
 	}
 	
 	public function getLikeCountById($user_id, $type_id, $type, $col = ['*'])

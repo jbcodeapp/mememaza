@@ -5,6 +5,10 @@ use App\Http\Controllers\Controller;
 use App\Components\Api\CommonManager;
 use Illuminate\Http\Request;
 use Validator, Auth, DB;
+use App\Models\Like;
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Model;
+
 //use Illuminate\Support\Str;
 class IndexController extends Controller
 {
@@ -31,23 +35,15 @@ class IndexController extends Controller
 		$limit = 10;
 		
 		$path=cdn('');
-		$postcol = [
-				'posts.id', 'categories.name as category', 'posts.desc', 'posts.slug', 'posts.title', 'posts.created_at', DB::raw('CONCAT("' . $path . '","",posts.image) as image_path'),
-				'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
-				];
 		
 		$path=cdn(PUB."story/");
 		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
-		/* $stories = DB::table('stories')->select(['id', 'story', 'link', 'story_type', 'created_at'])->where('status', 1)->whereDate('time', '>', $currentDate)->get();
-		foreach($stories as $story) {
-			$story->image_path = cdn($story->story);
-		} */
 		
 		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image', 'categories.created_at']);
 		foreach($categories as $category) {
 			$category->image_path = cdn($category->image);
 		} 
-		$post = $this->postData($page, $limit, $slug, $postcol);
+		$post = $this->postData($page, $limit, $slug);
 		
 		$postlist  = $post['data'];
 		foreach($post['data'] as $postobj) {
@@ -100,10 +96,11 @@ class IndexController extends Controller
 		return response()->json(['statuscode'=>true, 'post' => $this->postData($page, $limit, $slug, $col)], 200);
 	} */
 	
-	private function postData($page, $limit, $slug, $col) {
+	private function postData($page, $limit, $slug) {
 		
 		$commonManagerObj = CommonManager::getInstance();
-		return $post = $commonManagerObj->getPostsLimit($page, $limit, $slug, $col);
+		
+		return $post = $commonManagerObj->getPostsLimit($page, $limit, $slug);
 		
 	}
 	
@@ -236,26 +233,36 @@ class IndexController extends Controller
 	}
 	
 	public function updatelike(Request $request) {
-		$postid = $request->id;
-		$post = DB::table('posts')->select('like')->whereid($postid);
-		if($post->first() == null) {
-			return response()->json(['status' => 'error', 'message' => 'Post not found']);
+		$model = Model::resolveMorphClass($request->type);
+
+		$item = $model::find($request->id);
+		if($item) {
+			try {
+				$item->like();
+				return response()->json(['status' => 'success']);
+			} catch(\Exception $e) {
+				return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+			}
+		} else {
+			abort(400);
 		}
-		$post->increment('like');
-		return response()->json(['status' => 'success', 'like' => $post->first()->like]);
 	}
 	
 	public function updatedislike(Request $request) {
-		$postid = $request->id;
-		$post = DB::table('posts')->select('like')->whereid($postid);
-		if($post->first() == null) {
-			return response()->json(['status' => 'error', 'message' => 'Post not found']);
-		} else {
-			if($post->first()->like == 0) {
-				return response()->json(['status' => 'success', 'like' => 0]);
+		$like = Like::where('type', $request->type)
+				->where('type_id', $request->id)
+				->where('user_id', auth()->id)
+				->get();
+
+		if($like) {
+			try {
+				$like->delete();
+				return response()->json(['status' => 'success']);
+			} catch(\Exception $e) {
+				return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
 			}
+		} else {
+			abort(400);
 		}
-		$post->decrement('like');
-		return response()->json(['status' => 'success', 'like' => $post->first()->like]);
 	}
 }

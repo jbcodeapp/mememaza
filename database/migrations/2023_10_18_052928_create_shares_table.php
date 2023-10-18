@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('shares', function (Blueprint $table) {
             $table->bigIncrements('id');
 			$table->string('type');
 			$table->integer('type_id')->index();
@@ -23,9 +23,7 @@ return new class extends Migration
                 ->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
-			$table->text('comment');
-            $table->timestamp('createdate')->default(DB::raw('CURRENT_TIMESTAMP'));
-            //$table->timestamps();
+            $table->timestamps();
         });
     }
 
@@ -36,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('shares');
     }
 };

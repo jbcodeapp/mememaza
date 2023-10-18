@@ -12,6 +12,11 @@ class AuthController extends Controller
 	   $this->middleware('auth:api');
     }
 	
+	public function checkauth() {
+		// if the code reaches here then the user is already logged in via auth:api middleware
+		return response()->json(['message' => 'logged in']);
+	}
+
 	public function handlelike(Request $request) {
 		$user = auth()->user();
 		$userid = $user->id;
