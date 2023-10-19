@@ -54,8 +54,6 @@ jobs:
         run: |
           php artisan key:generate
           echo "Key generated successfully!"
-          php artisan migrate:fresh --seed
-          echo "Database Reset and Seeded successfully!"
           php artisan passport:install --force
           echo "Passport instantiated successfully!"
           php artisan config:cache
