@@ -21,8 +21,22 @@ class CommonManager {
 	
 	public function getPostsLimit($page, $limit, $slug = null) {
 		// Create a base query using the Post model
-		$query = Post::select(['*'])
-			->withCount('likes', 'comments', 'shares', 'views')
+		$query = Post::with([
+				'category' => function($query) {
+					$query->select(['id', 'name', 'banner_image']);
+				}
+			])
+			->with(['likes.liker' => function($query) {
+				$query->select('id');
+			}])
+			->with('comments.commenter')
+			->with(['views.viewer' => function($query) {
+				$query->select(['id', 'name']);
+			}])
+			->with(['shares.sharer' => function($query) {
+				$query->select(['id', 'name']);
+			}])
+			->withCount(['shares', 'likes', 'views', 'comments'])
 			->whereHas('category', function ($query) {
 				$query->where('status', 1);
 			})
@@ -35,7 +49,7 @@ class CommonManager {
 	
 		// Paginate the results
 		$list = $query->orderBy('id', 'asc')
-			->paginate($limit, ['*'], 'page', $page);
+			->paginate($limit, $page);
 	
 		return ['count' => $list->count(), 'data' => $list->items()];
 	}

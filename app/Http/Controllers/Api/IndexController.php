@@ -25,15 +25,29 @@ class IndexController extends Controller
 		
 		return response()->json(['statuscode'=>true, 'stories' => $stories], 200);
 	}
+
+	public function getPaginatedPosts(Request $request) {
+		$page = ($request->page > 0) ?  $request->page : 1;
+		$limit = 10;
+		$totalItems = Post::where('status', 1)
+					->whereHas('category', function ($query) {
+						$query->where('status', 1);
+					})->count();
+		$commonManagerObj = CommonManager::getInstance();
+		
+		$post = $commonManagerObj->getPostsLimit($page, $limit);
+		
+		$postlist  = $post['data'];
+		
+		return response()->json(['posts' => $postlist, 'total' => $totalItems, 'limit' => $limit, 'page' => $page], 200);
+	}
+
     public function index(Request $request, $slug=null) {
 		$userid = null;
 		if (Auth()->guard('api')->check()) {
 			$userid =  auth('api')->user()->id;
 		}
 		$obj = CommonManager::getInstance();
-		$page = ($request->page > 0) ?  $request->page : 1;
-		$limit = 10;
-		
 		$path=cdn('');
 		
 		$path=cdn(PUB."story/");
@@ -43,19 +57,13 @@ class IndexController extends Controller
 		foreach($categories as $category) {
 			$category->image_path = cdn($category->image);
 		} 
-		$post = $this->postData($page, $limit, $slug);
 		
-		$postlist  = $post['data'];
-		foreach($post['data'] as $postobj) {
-			//$this->generateSlug($postobj->id, $postobj->title);
-			
-			$postobj->likestatus = 0;
-			if($userid != null) {
-				$postobj->likestatus = $obj->getLikeCountById($userid, $postobj->id, 1);
-			}
-		}
-		
-		$reels = DB::table('reels')->select(['id', 'slug', 'reel', 'link', 'thumb', 'reel_type', 'created_at'])->where('status', 1)->orderBy('id', 'desc')->get();
+		$reels = DB::table('reels')
+				->select(['id', 'slug', 'reel', 'link', 'thumb', 'reel_type', 'created_at'])
+				->where('status', 1)
+				->orderBy('id', 'desc')
+				->get();
+
 		$reelsData = [];
 		
 		foreach($reels as $reel) {
@@ -78,9 +86,8 @@ class IndexController extends Controller
 							];
 		}
 
-		return response()->json(['statuscode'=>true, 'userid' => $userid,
-		'page' => $page, 'slug' => $slug, 'postcount' => $post['count'],
-		'categories' => $categories, 'post' => $postlist, 'reels' => $reelsData], 200);
+		return response()->json(['statuscode'=>true, 'userid' => $userid, 'slug' => $slug,
+		'categories' => $categories, 'reels' => $reelsData], 200);
 	}
 
 	/* public function post(Request $request, $slug=null) {
@@ -96,13 +103,6 @@ class IndexController extends Controller
 		return response()->json(['statuscode'=>true, 'post' => $this->postData($page, $limit, $slug, $col)], 200);
 	} */
 	
-	private function postData($page, $limit, $slug) {
-		
-		$commonManagerObj = CommonManager::getInstance();
-		
-		return $post = $commonManagerObj->getPostsLimit($page, $limit, $slug);
-		
-	}
 	
 	public function search(Request $request, $search) {
 		$params = [];
@@ -211,17 +211,7 @@ class IndexController extends Controller
 	public function postcomment(Request $request, $slug) {
 		return response()->json(['comment' => DB::table('posts')->select('comment')->where('slug', $slug)->first()->comment]);
 	}
-	
-	public function updatedownload(Request $request) {
-		$postid = $request->id;
-		$post = DB::table('posts')->select('download')->whereid($postid);
-		if($post->first() == null) {
-			return response()->json(['status' => 'error', 'message' => 'Post not found']);
-		}
-		$post->increment('download');
-		return response()->json(['status' => 'success', 'download' => $post->first()->download]);
-	}
-	
+
 	public function updateshare(Request $request) {
 		$postid = $request->id;
 		$post = DB::table('posts')->select('share')->whereid($postid);
@@ -233,30 +223,21 @@ class IndexController extends Controller
 	}
 	
 	public function updatelike(Request $request) {
-		$model = Model::resolveMorphClass($request->type);
+		$modelType = "App\Models\\".$request->type;
+
+		$model = new $modelType;
 
 		$item = $model::find($request->id);
 		if($item) {
+			// check if already liked
+			$preExistingLike = $item->likes()->where('user_id', auth()->user()->id)->first();
+
+			if($preExistingLike) {
+				$preExistingLike->delete();
+				return response()->json(['status' => 'success']);
+			}
 			try {
 				$item->like();
-				return response()->json(['status' => 'success']);
-			} catch(\Exception $e) {
-				return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
-			}
-		} else {
-			abort(400);
-		}
-	}
-	
-	public function updatedislike(Request $request) {
-		$like = Like::where('type', $request->type)
-				->where('type_id', $request->id)
-				->where('user_id', auth()->id)
-				->get();
-
-		if($like) {
-			try {
-				$like->delete();
 				return response()->json(['status' => 'success']);
 			} catch(\Exception $e) {
 				return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);

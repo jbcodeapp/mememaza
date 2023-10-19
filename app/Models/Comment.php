@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     use HasFactory;
+
+    public function commenter() {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 }

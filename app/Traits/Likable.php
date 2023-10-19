@@ -8,11 +8,12 @@
         return $this->hasMany(\App\Models\Like::class, 'type_id', 'id')
             ->where('type', $this->getLikableMorphType());
     }
-
+    
     public function like()
     {
         return $this->likes()->create([
             'user_id' => auth()->user()->id,
+            'type' => $this->getLikableMorphType(),
         ]);
     }
 

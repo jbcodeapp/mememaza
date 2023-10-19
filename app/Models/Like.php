@@ -9,6 +9,9 @@ class Like extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['user_id'];
+    protected $fillable = ['user_id', 'type'];
 
+    public function liker() {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 }

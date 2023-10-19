@@ -6,7 +6,7 @@
   {
     public function shares()
     {
-        return $this->hasMany(\App\Models\Like::class, 'type_id', 'id')
+        return $this->hasMany(\App\Models\Share::class, 'type_id', 'id')
             ->where('type', $this->getShareableMorphType());
     }
 

@@ -38,7 +38,7 @@ Route::post('updateshare',[IndexController::class,'updateshare']);
 Route::post('updatelike',[IndexController::class,'updatelike']);
 Route::post('updatedislike',[IndexController::class,'updatedislike']);
 
-
+Route::get('post/paginated',[IndexController::class,'getPaginatedPosts']);
 Route::get('post/{slug?}',[IndexController::class,'index']);
 Route::get('search/{search}',[IndexController::class,'search']);
 
@@ -49,7 +49,6 @@ Route::get('detail/{id}',[IndexController::class,'detail']);
 Route::middleware(['auth:api'])->group(function(){
 	Route::get('check-auth',[AuthController::class,'checkauth']);
 	Route::post('updatelike',[IndexController::class,'updatelike']);
-	Route::post('updatedislike',[IndexController::class,'updatedislike']);
 	Route::post('comment',[AuthController::class,'comment']);
 	Route::post('deletecomment',[AuthController::class,'deletecomment']);
 	Route::post('logout',[LoginController::class,'logout']);
