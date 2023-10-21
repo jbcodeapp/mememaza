@@ -7,6 +7,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IndexController;
 use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
+use App\Http\Controllers\DownloadController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,6 +33,7 @@ Route::get('/home', [DashboardController::class, 'dashboard'])->name('home');
 Route::get('/register', [AdminController::class, 'logset']);
 Route::get('/login', [AdminController::class, 'logset']);
 // Admin Routes
+Route::get('/download', [DownloadController::class, 'downloadFile'])->name('download.file');
 
 Route::get('/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
 Route::post('/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post'); 
@@ -40,6 +43,11 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'submitResetPas
 //Route::group(['prefix' => ADMIN_PREFIX], function() {
 //Route::group(['prefix' => 'admin'], function() {
 	
+	// Route::get('/test', function(){
+	// 	$post = App\Models\Post::withCount('likes')->first()->toArray();
+
+	// 	dd($post);
+	// });
 	Route::get('/', [AdminController::class, 'index'])->name('login');
 	Route::post('/alogin', [AdminController::class, 'login'])->name('admin.login');
 	Route::get('/dashboard', [DashboardController::class, 'dashboard']);

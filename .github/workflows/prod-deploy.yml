@@ -54,6 +54,8 @@ jobs:
         run: |
           php artisan key:generate
           echo "Key generated successfully!"
+          php artisan passport:install --force
+          echo "Passport instantiated successfully!"
           php artisan config:cache
           echo "Configuration cache cleared! Configuration cached successfully!"
           php artisan config:clear

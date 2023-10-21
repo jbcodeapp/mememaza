@@ -47,7 +47,7 @@ class LoginController extends Controller
 			]);
 
 			if($validator->fails()){
-				return response()->json(['statuscode' => false, 'errors' => $validator->errors()->all()]);
+				return response()->json(['errors' => $validator->errors()->all()])->setStatusCode(200);
 			}
 			
 			$regionManager = \App\Components\Api\CommonManager::getInstance();
@@ -70,11 +70,11 @@ class LoginController extends Controller
 				return response()->json(['statuscode' => true, 'message' => 'Congratulations! your account is registered.']);
 			}
 			
-			return response()->json(['statuscode' => false, 'errors' => ['Try again']]);
+			return response()->json([ 'errors' => ['Try again']])->setStatusCode(400);
 		}
 		catch(Exception $e)
 		{
-			return response()->json(['statuscode' => false, 'errors' => ['Try again']]);
+			return response()->json(['errors' => ['Try again']])->setStatusCode(500);
 		}
 	}
 	

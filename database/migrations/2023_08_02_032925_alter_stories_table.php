@@ -14,8 +14,6 @@ return new class extends Migration
     public function up()
     {
         DB::statement("ALTER TABLE `stories` ADD `link` VARCHAR(255) NULL DEFAULT NULL AFTER `story`;");
-		
-		DB::statement("ALTER TABLE `posts` ADD `like` INT(11) NOT NULL DEFAULT '0' AFTER `image`, ADD `view` INT(11) NOT NULL DEFAULT '0' AFTER `like`, ADD `share` INT(11) NOT NULL DEFAULT '0' AFTER `view`, ADD `comment` INT(11) NOT NULL DEFAULT '0' AFTER `share`;");
     }
 
     /**

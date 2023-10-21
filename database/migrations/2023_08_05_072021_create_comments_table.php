@@ -14,11 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-			$table->integer('type_id');
-			$table->integer('user_id');
+            $table->bigIncrements('id');
+			$table->string('type');
+			$table->integer('type_id')->index();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
 			$table->text('comment');
-			$table->tinyInteger('type')->default(1)->comment('1:Post');
             $table->timestamp('createdate')->default(DB::raw('CURRENT_TIMESTAMP'));
             //$table->timestamps();
         });

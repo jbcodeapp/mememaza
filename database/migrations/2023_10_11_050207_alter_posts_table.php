@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-		DB::statement("ALTER TABLE `posts` ADD `download` INT(11) NOT NULL DEFAULT '0' AFTER `like`;");
+		DB::statement("ALTER TABLE `posts` ADD `download` INT(11) NOT NULL DEFAULT '0' AFTER `status`;");
         DB::statement("ALTER TABLE `posts` ADD `meta_title` TEXT NULL DEFAULT NULL AFTER `image`, ADD `meta_keyword` TEXT NULL DEFAULT NULL AFTER `meta_title`, ADD `meta_desc` TEXT NULL DEFAULT NULL AFTER `meta_keyword`;");
     }
 
