@@ -14,9 +14,14 @@ class Post extends Model
 {
     use HasFactory, Likable, Commentable, Viewable, Shareable;
 
-    protected $appends = ['image_path'];
+    protected $appends = ['image_path', "type", 'user_has_liked'];
 
-    public function category() 
+    public function getTypeAttribute()
+    {
+        return 'post';
+    }
+
+    public function category()
     {
         return $this->belongsTo(\App\Models\Category::class);
     }

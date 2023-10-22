@@ -14,8 +14,18 @@ class Reel extends Model
 {
     use HasFactory, Likable, Commentable, Viewable, Shareable;
 
-    public function category() 
+    protected $appends = ["type", 'image_path', 'user_has_liked'];
+
+    public function getTypeAttribute()
     {
-        return $this->belongsTo(App\Models\Category::class);
+        return 'reel';
+    }
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\Category::class);
+    }
+    public function getImagePathAttribute()
+    {
+        return cdn('') . $this->vdo_image;
     }
 }
