@@ -31,10 +31,9 @@ class Reel extends Model
                 return $this->link;
 
             case 2:
-                return cdn('') . $this->link;
-            case 3:
                 return cdn('') . $this->vdo_image;
-
+            case 3:
+                return cdn('') . $this->link;
         }
     }
 }
