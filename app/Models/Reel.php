@@ -26,7 +26,7 @@ class Reel extends Model
     }
     public function getImagePathAttribute()
     {
-        switch ($this->type) {
+        switch ($this->reel_type) {
             case 1:
                 return $this->link;
 
