@@ -40,6 +40,7 @@ Route::post('updatelike', [IndexController::class, 'updatelike']);
 Route::post('updatedislike', [IndexController::class, 'updatedislike']);
 
 Route::get('post/paginated', [IndexController::class, 'getPaginatedPosts']);
+
 Route::get('post/{slug?}', [IndexController::class, 'index']);
 Route::get('search/{search}', [IndexController::class, 'search']);
 
@@ -48,7 +49,6 @@ Route::get('loadcomment/{postid}/{pageid}', [IndexController::class, 'loadcommen
 Route::get('detail/{id}', [IndexController::class, 'detail']);
 
 Route::middleware(['auth:api'])->group(function () {
-	Route::get('post/paginated', [IndexController::class, 'getPaginatedPosts']);
 	Route::get('check-auth', [AuthController::class, 'checkauth']);
 	Route::post('updatelike', [IndexController::class, 'updatelike']);
 	Route::post('comment', [AuthController::class, 'comment']);
