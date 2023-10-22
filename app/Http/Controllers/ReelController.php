@@ -52,10 +52,7 @@ class ReelController extends Controller
             if ($request->reel_type == 1) { //link
                 $rules['videolink'] = 'required';
             } else if ($request->reel_type == 2) { //video
-                //if($request->hasFile('video')) {
-                $rules['video'] = 'required|mimes:mp4,ogx,oga,ogv,ogg,webm,3gp,avi|max:20000';
-                //$rules['thumb'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
-                //}
+                $rules['video'] = 'required|mimes:mp4,ogx,oga,ogv,ogg,webm|max:21000';
 
             } else if ($request->reel_type == 3) { //image
                 $rules['image'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
