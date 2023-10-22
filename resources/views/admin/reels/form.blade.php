@@ -102,7 +102,7 @@
 							<label for="exampleInputFile">Upload Video</label>
 							<div class="input-group video">
 							  <div class="custom-file">
-								<input type="file" class="custom-file-input " name="video">
+								<input type="file" accept="video/mp4, video/webm, video/ogg, video/avi, video/3gp" class="custom-file-input" name="video">
 								<label class="custom-file-label" for="exampleInputFile">Choose file</label>
 							  </div>
 							</div>
@@ -122,7 +122,7 @@
 							<label for="exampleInputFile">Upload Image</label>
 							<div class="input-group image">
 							  <div class="custom-file">
-								<input type="file" class="custom-file-input " name="image">
+								<input type="file" accept="image/jpeg, image/png, image/gif, image/bmp, image/webp" class="custom-file-input " name="image">
 								<label class="custom-file-label" for="exampleInputFile">Choose file</label>
 							  </div>
 							</div>

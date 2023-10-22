@@ -11,88 +11,97 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function uploadImage($request, $field, $storage_dir_key) {
-		$params = [];
-	
-		if ($request->hasFile($field)){
-			$date = \Carbon\Carbon::now();
-			$prefix_directory = $storage_dir_key .'/'. $date->format('FY');
+    public function uploadImage($request, $field, $storage_dir_key)
+    {
+        $params = [];
 
-			// Handle jpeg, jpg, svg, png image types here
-			// This assumes your client sends the image with the key 'photo'
-			$file = $request->file($field);
+        if ($request->hasFile($field)) {
+            $date = \Carbon\Carbon::now();
+            $prefix_directory = $storage_dir_key . '/' . $date->format('FY');
+
+            // Handle jpeg, jpg, svg, png image types here
+            // This assumes your client sends the image with the key 'photo'
+            $file = $request->file($field);
 
             $file_name_extension = $field . '_' . time() . '_' . str_replace(
                 ' ',
                 '_',
-                explode('.', $file->getClientOriginalName())[0].'.webp'
+                explode('.', $file->getClientOriginalName())[0] . '.webp'
             );
-	
-			// Create a new image instance using GD
-			$image = imagecreatefromstring(file_get_contents($file->getRealPath()));
-	
-			$path = 'storage/' . $prefix_directory;
 
-			// Check if the storage directory exists, and create it if not
-			if (!\File::isDirectory($path)) {
-				\File::makeDirectory($path, 0777, true, true);
-			}
-			$filePath = $path . '/' . $file_name_extension;
+            // Create a new image instance using GD
+            $image = imagecreatefromstring(file_get_contents($file->getRealPath()));
 
-			// Save the image as webp format
-			imagewebp($image, $filePath, 0.9);
-	
-			// Free up memory
-			imagedestroy($image);
-	
-			$params[$field] = $filePath;
-		}
-	
-		return $params;
-	}
+            $path = 'storage/' . $prefix_directory;
 
-    public function uploadVideo($request, $field, $storage_dir_key, $isStory = false) {
+            // Check if the storage directory exists, and create it if not
+            if (!\File::isDirectory($path)) {
+                \File::makeDirectory($path, 0777, true, true);
+            }
+            $filePath = $path . '/' . $file_name_extension;
+
+            // Save the image as webp format
+            imagewebp($image, $filePath, 0.9);
+
+            // Free up memory
+            imagedestroy($image);
+
+            $params[$field] = $filePath;
+        }
+
+        return $params;
+    }
+
+    public function uploadVideo($request, $field, $storage_dir_key, $isStory = false)
+    {
         $params = [];
-    
+
         if ($request->hasFile($field)) {
             $date = \Carbon\Carbon::now();
             $prefix_directory = $storage_dir_key . '/' . $date->format('FY');
-    
+
             // Get the uploaded video file
             $file = $request->file($field);
-            
+
             // Generate a unique file name with a timestamp
             $file_name_extension = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            
+
             // Define the path to the storage directory
-            $path = 'storage/' . $prefix_directory. '/videos';
-    
+            $path = 'storage/' . $prefix_directory . '/videos';
+
             // Check if the storage directory exists, and create it if not
             if (!\File::isDirectory($path)) {
                 \File::makeDirectory($path, 0777, true, true);
             }
 
-            $filePath = $path . '/temp_' . $file_name_extension;
-            $croppedFilePath = $path . '/' . $file_name_extension;
-    
+            $filePath = $path . '/' . $file_name_extension;
+            $croppedFilePath = $path . '/cropped_' . $file_name_extension;
+
+            $gifVideoPath = $path . '/gif_' . preg_replace("/\.[^.]+$/", "", $file_name_extension) . '.gif';
+
             // Move the uploaded video to the storage directory
-            if($file->move($path, $file_name_extension)) {
-                if($isStory) {
+            if ($file->move($path, $file_name_extension)) {
+                $command = "ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:3 $gifVideoPath";
+                $output = shell_exec($command);
+
+                //system($command);
+                if ($isStory) {
                     exec("ffmpeg -i $filePath -b 3000000 $croppedFilePath");
-					//vdo_image
+                    //vdo_image
                 } else {
                     exec("ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:28 $croppedFilePath");
                 }
                 try {
                     unlink($filePath);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
 
                 }
             }
-    
+
             $params[$field] = $croppedFilePath;
+            $params['vdo_image'] = $gifVideoPath;
         }
-    
+
         return $params;
     }
 }
