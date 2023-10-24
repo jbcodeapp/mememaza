@@ -16,12 +16,13 @@ class DatabaseSeeder extends Seeder
     {
         \App\Models\User::factory(10)->create();
         \App\Models\Category::factory(20)->create();
-        \App\Models\Post::factory(99)->create();
+        \App\Models\Post::factory(5)->create();
 
         \App\Models\Admin\Admin::create([
             'name' => 'Admin',
             'email' => 'admin@admin.com',
-            'password' => '$2y$10$ZCQbWerq142X0jF8JfBouOiw072afRDB8OXIKdSPwZRXgFdjhjOqu', // 12345678
+            'password' => '$2y$10$ZCQbWerq142X0jF8JfBouOiw072afRDB8OXIKdSPwZRXgFdjhjOqu',
+            // 12345678
             'status' => 1,
         ]);
     }

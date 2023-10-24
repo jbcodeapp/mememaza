@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Components\Api\CommonManager;
+use App\Models\PostReelIndex;
 use App\Models\Reel;
 use Illuminate\Http\Request;
 use Validator, Auth, DB;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 //use Illuminate\Support\Str;
 class IndexController extends Controller
 {
+	private $postsLimit = 10;
+
 	public function stories()
 	{
 		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
@@ -28,7 +31,6 @@ class IndexController extends Controller
 	public function getPaginatedPosts(Request $request)
 	{
 		$page = ($request->page > 0) ? $request->page : 1;
-		$limit = 10;
 		$totalItems = Post::where('status', 1)
 			->whereHas('category', function ($query) {
 				$query->where('status', 1);
@@ -36,7 +38,7 @@ class IndexController extends Controller
 
 		$commonManagerObj = CommonManager::getInstance();
 
-		$post = $commonManagerObj->getPostsLimit($page, $limit);
+		$post = $commonManagerObj->getPostsLimit($page, $this->postsLimit);
 
 		$postlist = $post['data'];
 		$reels = $post['reels'];
@@ -47,7 +49,7 @@ class IndexController extends Controller
 		// Create a new array to store the sorted data
 		$sortedData = collect($combinedData)->sortBy('created_at', null, true)->values();
 
-		return response()->json(['posts' => $sortedData, 'total' => $totalItems, 'limit' => $limit, 'page' => $page], 200);
+		return response()->json(['posts' => $sortedData, 'total' => $totalItems, 'limit' => $this->postsLimit, 'page' => $page], 200);
 	}
 
 	public function index(Request $request, $slug = null)
@@ -105,17 +107,17 @@ class IndexController extends Controller
 	}
 
 	/* public function post(Request $request, $slug=null) {
-																																																																									 
-																																																																									 $page = ($request->page > 0) ?  $request->page : 1;
-																																																																									 $limit = 3;
-																																																																									 $path=cdn(PUB."uploads/post");
-																																																																									 $col = [
-																																																																											 'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '/","",posts.image) as image_path'),
-																																																																											 'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
-																																																																											 ];
-																																																																									 
-																																																																									 return response()->json(['statuscode'=>true, 'post' => $this->postData($page, $limit, $slug, $col)], 200);
-																																																																								 } */
+																																																																																																																																																																																																																															 
+																																																																																																																																																																																																																															 $page = ($request->page > 0) ?  $request->page : 1;
+																																																																																																																																																																																																																															 $limit = 3;
+																																																																																																																																																																																																																															 $path=cdn(PUB."uploads/post");
+																																																																																																																																																																																																																															 $col = [
+																																																																																																																																																																																																																																	 'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '/","",posts.image) as image_path'),
+																																																																																																																																																																																																																																	 'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
+																																																																																																																																																																																																																																	 ];
+																																																																																																																																																																																																																															 
+																																																																																																																																																																																																																															 return response()->json(['statuscode'=>true, 'post' => $this->postData($page, $limit, $slug, $col)], 200);
+																																																																																																																																																																																																																														 } */
 
 
 	public function search(Request $request, $search)
@@ -199,10 +201,93 @@ class IndexController extends Controller
 		return response()->json(['nextpage' => $nextpage, 'comments' => $data]);
 	}
 
-	public function postbyslug(Request $request, $slug)
+	public function getSortedData($page, $limit)
 	{
+		$postlist = Post::select(['id', 'slug', 'created_at'])
+			->orderByDesc('created_at')
+			->paginate($limit, $page)
+			->items();
 
-		return response()->json(['obj' => DB::table('posts')->where('slug', $slug)->first()]);
+		$reels = Reel::select(['id', 'slug', 'created_at'])
+			->orderByDesc('created_at')
+			->paginate($limit, $page)
+			->items();
+
+		// Combine the posts and reels into a single array
+		$combinedData = array_merge($postlist, $reels);
+
+		// Create a new array to store the sorted data
+		return collect($combinedData)
+			->sortBy('created_at', null, true)
+			->values()
+			->toArray();
+	}
+
+	public function postbyslug(Request $request, $slug, $type)
+	{
+		$page = $request->page ? $request->page : 3;
+
+		if ($type === 'reel') {
+			$tableName = 'reels';
+		} else if ($type === 'post') {
+			$tableName = 'posts';
+		}
+
+		// Create a new array to store the sorted data
+		$sortedData = $this->getSortedData($page, $this->postsLimit);
+
+		$previousSlug = null;
+
+		$nextSlug = null;
+		$postOrReel = DB::table($tableName)->where('slug', $slug)->first();
+		$id = $postOrReel->id;
+
+		foreach ($sortedData as $i => $item) {
+			if ($item['slug'] === $slug && $item['type'] === $type) {
+
+				// Create a new array to store the sorted data
+				$currentItem = PostReelIndex::where($type . "_id", $id)
+					->first();
+
+				$previousItem = PostReelIndex::where('id', $currentItem->id + 1)
+					->with(['post', 'reel'])
+					->first();
+
+				$nextItem = PostReelIndex::where('id', $currentItem->id - 1)
+					->with(['post', 'reel'])
+					->first();
+
+				if ($previousItem) {
+					if ($previousItem['reel']) {
+						$prevType = 'reel';
+					} else if ($previousItem['post']) {
+						$prevType = 'post';
+					}
+					$prevSlug = $previousItem[$prevType]['slug'];
+				}
+
+				if ($nextItem) {
+					if ($nextItem['reel']) {
+						$nextType = 'reel';
+					} else if ($nextItem['post']) {
+						$nextType = 'post';
+					}
+
+					$nxtSlug = $nextItem[$nextType]['slug'];
+				}
+
+
+
+				if ($previousItem) {
+					$previousSlug = '/' . $prevType . '/' . $prevSlug;
+				}
+				if ($nextItem) {
+					$nextSlug = '/' . $nextType . '/' . $nxtSlug;
+				}
+			}
+		}
+
+		return response()->json(['obj' => $postOrReel, 'previous' => $previousSlug, 'next' => $nextSlug]);
 	}
 
 	public function reelbyslug(Request $request, $slug)

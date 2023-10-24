@@ -14,6 +14,8 @@ class Post extends Model
 {
     use HasFactory, Likable, Commentable, Viewable, Shareable;
 
+    protected $fillable = ['title', 'desc', 'category_id', 'status', 'meta_title', 'meta_keyword', 'meta_desc', 'image', 'slug'];
+
     protected $appends = ['image_path', "type", 'user_has_liked'];
 
     public function getTypeAttribute()

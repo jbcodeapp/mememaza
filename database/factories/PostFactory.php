@@ -19,10 +19,10 @@ class PostFactory extends Factory
     {
         $title = fake()->sentence;
         $imageNumber = random_int(1, 99);
-
+        $this->wait();
         return [
             'title' => $title,
-            'category_id' => fake()->numberBetween(1, 20), // Adjust the range as needed
+            'category_id' => fake()->numberBetween(1, 20),
             'slug' => Str::slug($title),
             'image' => "faker/images/posts/image_$imageNumber.jpg",
             'meta_title' => fake()->text,
@@ -30,9 +30,12 @@ class PostFactory extends Factory
             'meta_desc' => fake()->text,
             'desc' => fake()->paragraph,
             'status' => fake()->boolean,
-            'download' => fake()->numberBetween(0, 100), // Adjust the range as needed
-            'created_at' => fake()->dateTimeThisYear(),
-            'updated_at' => fake()->dateTimeThisYear(),
+            'download' => fake()->numberBetween(0, 100),
         ];
+    }
+
+    public function wait()
+    {
+        sleep(1);
     }
 }

@@ -97,7 +97,6 @@ class IndexController extends BaseController
 			$link = $record->link;
 			$thumb = '';
 			if ($record->reel_type == 1) { //link
-
 			} else if ($record->reel_type == 2) { //video
 				$src = cdn($record->vdo_image); // 
 				//$link = public_path('uploads/reel/'.$record->id.'/'.$record->link);
@@ -462,6 +461,7 @@ class IndexController extends BaseController
 			} else {
 				$params['slug'] = $this->generateSlug($request->title);
 				$status = $commonManagerObj->insert_post($params);
+
 				if ($status) {
 					return response()->json(['status' => 'success', 'msg' => 'Successfully Save']);
 				}
@@ -837,20 +837,20 @@ class IndexController extends BaseController
 
 
 			/* $commonManagerObj = CommonManager::getInstance();
-																																																											 if($id > 0) {
-																																																												 
-																																																												 $status = $commonManagerObj->updateStoryById($id, $params);
-																																																												 if($status) {
-																																																													 return response()->json(['status' => 'success', 'msg' => 'Successfully Updated']);
-																																																												 }
-																																																												 
-																																																											 } else {
-																																																												 
-																																																												 $status = $commonManagerObj->insert_story($params);
-																																																												 if($status) {
-																																																													 return response()->json(['status' => 'success', 'msg' => 'Successfully Save']);
-																																																												 }
-																																																											 } */
+																																																																				 if($id > 0) {
+																																																																					 
+																																																																					 $status = $commonManagerObj->updateStoryById($id, $params);
+																																																																					 if($status) {
+																																																																						 return response()->json(['status' => 'success', 'msg' => 'Successfully Updated']);
+																																																																					 }
+																																																																					 
+																																																																				 } else {
+																																																																					 
+																																																																					 $status = $commonManagerObj->insert_story($params);
+																																																																					 if($status) {
+																																																																						 return response()->json(['status' => 'success', 'msg' => 'Successfully Save']);
+																																																																					 }
+																																																																				 } */
 
 			return response()->json(['status' => 'error', 'msg' => 'Please try again']);
 		}
@@ -875,12 +875,12 @@ class IndexController extends BaseController
 		$params = $this->uploadVideo($request, 'story', "stories", true);
 
 		/* 
-																																			$outputImgVideo = public_path($path.'/gif_anime.gif');
-																																			$command = "ffmpeg -i $inputVideo -ab 32 -ss 00:00:00 -t 00:00:3 $outputImgVideo";
-																																			$output = shell_exec($command); 
-																																			$status = $commonManagerObj->updateStoryById($id, ['story' => 'vdo.mp4', 'vdo_image' => 'gif_anime.gif']);
+																																									$outputImgVideo = public_path($path.'/gif_anime.gif');
+																																									$command = "ffmpeg -i $inputVideo -ab 32 -ss 00:00:00 -t 00:00:3 $outputImgVideo";
+																																									$output = shell_exec($command); 
+																																									$status = $commonManagerObj->updateStoryById($id, ['story' => 'vdo.mp4', 'vdo_image' => 'gif_anime.gif']);
 
-																																			*/
+																																									*/
 		//system($command);
 
 		if (count($params) > 0) {

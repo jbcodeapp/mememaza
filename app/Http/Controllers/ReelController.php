@@ -71,7 +71,7 @@ class ReelController extends Controller
 
                 switch ($request->reel_type) {
                     case 1:
-                        $reel->video_link = $request->video_link;
+                        $reel->link = $request->videolink;
                         break;
                     case 2:
                         $filePaths = $this->uploadVideo($request, 'video', 'reels');
