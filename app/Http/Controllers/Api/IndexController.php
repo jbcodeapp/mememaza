@@ -106,20 +106,6 @@ class IndexController extends Controller
 		], 200);
 	}
 
-	/* public function post(Request $request, $slug=null) {
-																																																																																																																																																																																																																															 
-																																																																																																																																																																																																																															 $page = ($request->page > 0) ?  $request->page : 1;
-																																																																																																																																																																																																																															 $limit = 3;
-																																																																																																																																																																																																																															 $path=cdn(PUB."uploads/post");
-																																																																																																																																																																																																																															 $col = [
-																																																																																																																																																																																																																																	 'posts.id', 'categories.name as category', 'posts.desc', 'posts.title', DB::raw('CONCAT("' . $path . '/","",posts.image) as image_path'),
-																																																																																																																																																																																																																																	 'posts.image', 'posts.like', 'posts.view', 'posts.share', 'posts.comment'
-																																																																																																																																																																																																																																	 ];
-																																																																																																																																																																																																																															 
-																																																																																																																																																																																																																															 return response()->json(['statuscode'=>true, 'post' => $this->postData($page, $limit, $slug, $col)], 200);
-																																																																																																																																																																																																																														 } */
-
-
 	public function search(Request $request, $search)
 	{
 		$params = [];
@@ -249,11 +235,11 @@ class IndexController extends Controller
 				$currentItem = PostReelIndex::where($type . "_id", $id)
 					->first();
 
-				$previousItem = PostReelIndex::where('id', $currentItem->id + 1)
+				$previousItem = PostReelIndex::where('id', $currentItem->id - 1)
 					->with(['post', 'reel'])
 					->first();
 
-				$nextItem = PostReelIndex::where('id', $currentItem->id - 1)
+				$nextItem = PostReelIndex::where('id', $currentItem->id + 1)
 					->with(['post', 'reel'])
 					->first();
 
