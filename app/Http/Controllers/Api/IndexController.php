@@ -235,12 +235,12 @@ class IndexController extends Controller
 				$currentItem = PostReelIndex::where($type . "_id", $id)
 					->first();
 
-				$previousItem = PostReelIndex::where('id', $currentItem->id - 1)
-					->with(['post', 'reel'])
+				$previousItem = PostReelIndex::where('created_at', '>', $currentItem->created_at)
+					->with(['post', 'reel'])->orderBy('created_at')
 					->first();
 
-				$nextItem = PostReelIndex::where('id', $currentItem->id + 1)
-					->with(['post', 'reel'])
+				$nextItem = PostReelIndex::where('created_at', '<', $currentItem->created_at)
+					->with(['post', 'reel'])->orderByDesc('created_at')
 					->first();
 
 				if ($previousItem) {

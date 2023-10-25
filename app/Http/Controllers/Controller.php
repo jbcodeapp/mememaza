@@ -41,7 +41,7 @@ class Controller extends BaseController
             $filePath = $path . '/' . $file_name_extension;
 
             // Save the image as webp format
-            imagewebp($image, $filePath, 0.9);
+            imagewebp($image, $filePath, 90);
 
             // Free up memory
             imagedestroy($image);

@@ -19,13 +19,13 @@ return new class extends Migration {
                 ->references('id')
                 ->on('reels')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
             $table->unsignedBigInteger('post_id')->nullable();
             $table->foreign('post_id')
                 ->references('id')
                 ->on('posts')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
