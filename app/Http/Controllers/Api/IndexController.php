@@ -9,6 +9,7 @@ use App\Models\Reel;
 use Illuminate\Http\Request;
 use Validator, Auth, DB;
 use App\Models\Like;
+use App\Models\Banner;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 
@@ -75,6 +76,8 @@ class IndexController extends Controller
 			->orderBy('id', 'desc')
 			->get();
 
+		$banners = Banner::where('status', 1)->get();
+
 		$reelsData = [];
 
 		foreach ($reels as $reel) {
@@ -101,6 +104,7 @@ class IndexController extends Controller
 			'statuscode' => true,
 			'userid' => $userid,
 			'slug' => $slug,
+			'banners' => $banners,
 			'categories' => $categories,
 			'reels' => $reelsData
 		], 200);
