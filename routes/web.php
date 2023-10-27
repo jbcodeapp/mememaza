@@ -7,6 +7,7 @@ use App\Http\Controllers\VideoUploadController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\DownloadController;
 
@@ -22,7 +23,7 @@ use App\Http\Controllers\DownloadController;
 */
 
 /* Route::get('/', function () {
-	return view('welcome');
+   return view('welcome');
 }); */
 
 Auth::routes();
@@ -67,6 +68,9 @@ Route::get('/post', [IndexController::class, 'post']);
 Route::get('/post_ajax', [IndexController::class, 'post_ajax']);
 Route::get('/post_form/{id}', [IndexController::class, 'post_form']);
 Route::post('/post_handle', [IndexController::class, 'post_handle']);
+
+Route::get('/image', [ImageController::class, 'create']);
+Route::post('store-image', [ImageController::class, 'store']);
 
 Route::get('/banner', [IndexController::class, 'banner']);
 Route::get('/banner_ajax', [IndexController::class, 'banner_ajax']);

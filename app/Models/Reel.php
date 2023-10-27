@@ -24,6 +24,7 @@ class Reel extends Model
     {
         return $this->belongsTo(\App\Models\Category::class);
     }
+
     public function getImagePathAttribute()
     {
         switch ($this->reel_type) {
@@ -31,9 +32,9 @@ class Reel extends Model
                 return $this->link;
 
             case 2:
-                return cdn('') . $this->vdo_image;
+                return $this->vdo_image;
             case 3:
-                return cdn('') . $this->link;
+                return $this->link;
         }
     }
 }

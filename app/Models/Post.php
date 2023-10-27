@@ -30,6 +30,6 @@ class Post extends Model
 
     public function getImagePathAttribute()
     {
-        return cdn('') . $this->image;
+        return $this->image;
     }
 }

@@ -24,7 +24,7 @@ class PostFactory extends Factory
             'title' => $title,
             'category_id' => fake()->numberBetween(1, 20),
             'slug' => Str::slug($title),
-            'image' => "faker/images/posts/image_$imageNumber.jpg",
+            'image' => config('app.url') . "/faker/images/posts/image_$imageNumber.jpg",
             'meta_title' => fake()->text,
             'meta_keyword' => implode(', ', fake()->words(3)),
             'meta_desc' => fake()->text,

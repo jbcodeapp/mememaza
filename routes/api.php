@@ -27,6 +27,7 @@ Route::post('register', [LoginController::class, 'register']);
 Route::get('stories', [IndexController::class, 'stories']);
 Route::get('getpostbyslug/{slug?}/{type}', [IndexController::class, 'postbyslug']);
 Route::get('getreelbyslug/{slug?}', [IndexController::class, 'reelbyslug']);
+Route::post('store-image', 'ImageController@store');
 
 Route::get('postdownload/{slug?}', [IndexController::class, 'postdownload']);
 Route::get('postshare/{slug?}', [IndexController::class, 'postshare']);

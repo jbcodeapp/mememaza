@@ -84,10 +84,10 @@ class IndexController extends Controller
 			$reelspath = $reel->link;
 			$thumb = '';
 			if ($reel->reel_type == 2) {
-				$reelspath = cdn($reel->link);
-				$thumb = cdn($reel->thumb);
+				$reelspath = $reel->link;
+				$thumb = $reel->thumb;
 			} else if ($reel->reel_type == 3) {
-				$reelspath = cdn($reel->link);
+				$reelspath = $reel->link;
 			}
 			$reelsData[] = [
 				'id' => $reel->id,
@@ -226,11 +226,36 @@ class IndexController extends Controller
 		// Create a new array to store the sorted data
 		$sortedData = $this->getSortedData($page, $this->postsLimit);
 
+
 		$previousSlug = null;
 
 		$nextSlug = null;
 		$postOrReel = DB::table($tableName)->where('slug', $slug)->first();
 		$id = $postOrReel->id;
+		$ip = $request->ip();
+
+		$checkQry = DB::table('views')
+			->where('ip', $ip)
+			->where('type_id', $id)
+			->where('type', $type);
+
+		if (auth()->user()) {
+			$checkQry->where('user_id', auth()->user()->id);
+		}
+		$checkobj = $checkQry->first();
+
+		if ($checkobj == null) {
+			$date = date('Y-m-d H:i:s');
+
+			DB::table('views')->insert([
+				'ip' => $ip,
+				'user_id' => auth()->user() ? auth()->user()->id : null,
+				'type' => $type,
+				'type_id' => $id,
+				'created_at' => $date,
+				'updated_at' => $date
+			]);
+		}
 
 		foreach ($sortedData as $i => $item) {
 			if ($item['slug'] === $slug && $item['type'] === $type) {
@@ -265,8 +290,6 @@ class IndexController extends Controller
 
 					$nxtSlug = $nextItem[$nextType]['slug'];
 				}
-
-
 
 				if ($previousItem) {
 					$previousSlug = '/' . $prevType . '/' . $prevSlug;

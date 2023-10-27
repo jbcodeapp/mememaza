@@ -12,14 +12,8 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('slug', 500)->index();
-            $table->string('image', 255);
-            $table->text('desc')->nullable();
-            $table->boolean('status')->default(1);
-            $table->timestamps();
+        Schema::table('reels', function (Blueprint $table) {
+            DB::statement("ALTER TABLE `reels` ADD `download` INT(11) NOT NULL DEFAULT '0' AFTER `status`;");
         });
     }
 
@@ -30,6 +24,8 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::table('reels', function (Blueprint $table) {
+            //
+        });
     }
 };

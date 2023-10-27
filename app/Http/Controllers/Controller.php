@@ -43,10 +43,16 @@ class Controller extends BaseController
             // Save the image as webp format
             imagewebp($image, $filePath, 90);
 
-            // Free up memory
-            imagedestroy($image);
+            $fileContents = file_get_contents(public_path($filePath));
 
-            $params[$field] = $filePath;
+            if (\Storage::disk('s3')->put($filePath, $fileContents)) {
+                $awsPath = \Storage::disk('s3')->url($filePath);
+                unlink($filePath);
+                // Free up memory
+                imagedestroy($image);
+                $params[$field] = $awsPath;
+            }
+
         }
 
         return $params;
@@ -81,9 +87,14 @@ class Controller extends BaseController
 
             // Move the uploaded video to the storage directory
             if ($file->move($path, $file_name_extension)) {
-                $command = "ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:3 $gifVideoPath";
+                $command = 'ffmpeg -i ' . $filePath . ' -vf "fps=24,scale=160:-1" -t 3 ' . $gifVideoPath;
                 $output = shell_exec($command);
 
+                $gifContents = file_get_contents(public_path($gifVideoPath));
+                if (\Storage::disk('s3')->put($gifVideoPath, $gifContents)) {
+                    $awsGifPath = \Storage::disk('s3')->url($gifVideoPath);
+                    unlink($gifVideoPath);
+                }
                 //system($command);
                 if ($isStory) {
                     exec("ffmpeg -i $filePath -b 3000000 $croppedFilePath");
@@ -91,6 +102,14 @@ class Controller extends BaseController
                 } else {
                     exec("ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:28 $croppedFilePath");
                 }
+
+                $vidContents = file_get_contents(public_path($croppedFilePath));
+
+                if (\Storage::disk('s3')->put($croppedFilePath, $vidContents)) {
+                    $awsCroppedFilePath = \Storage::disk('s3')->url($croppedFilePath);
+                    unlink($croppedFilePath);
+                }
+
                 try {
                     unlink($filePath);
                 } catch (\Exception $e) {
@@ -98,8 +117,8 @@ class Controller extends BaseController
                 }
             }
 
-            $params[$field] = $croppedFilePath;
-            $params['vdo_image'] = $gifVideoPath;
+            $params[$field] = $awsCroppedFilePath;
+            $params['vdo_image'] = $awsGifPath;
         }
 
         return $params;
