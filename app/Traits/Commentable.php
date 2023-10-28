@@ -1,25 +1,27 @@
 <?php
 
-  namespace App\Traits;
+namespace App\Traits;
 
-  trait Commentable
-  {
+trait Commentable
+{
     public function comments()
     {
         return $this->hasMany(\App\Models\Comment::class, 'type_id', 'id')
             ->where('type', $this->getCommentableMorphType());
     }
 
-    public function comment($comment)
+    public function comment($comment, $commentType)
     {
-        return $this->likes()->create([
+        return $this->comments()->create([
             'user_id' => auth()->user()->id,
-            'comment' => $comment
+            'type' => $this->getCommentableMorphType(),
+            'comment' => $comment,
+            'comment_type' => $commentType,
         ]);
     }
-    
+
     public function getCommentableMorphType()
     {
         return class_basename($this);
     }
-  }
+}

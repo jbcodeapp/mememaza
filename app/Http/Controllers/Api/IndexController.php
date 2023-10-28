@@ -218,9 +218,9 @@ class IndexController extends Controller
 		$page = $request->page ? $request->page : 3;
 
 		if ($type === 'reel') {
-			$tableName = 'reels';
+			$modelName = '\App\Models\Reel';
 		} else if ($type === 'post') {
-			$tableName = 'posts';
+			$modelName = '\App\Models\Post';
 		}
 
 		// Create a new array to store the sorted data
@@ -230,7 +230,27 @@ class IndexController extends Controller
 		$previousSlug = null;
 
 		$nextSlug = null;
-		$postOrReel = DB::table($tableName)->where('slug', $slug)->first();
+		$postOrReel = $modelName::with([
+			'likes.liker' => function ($query) {
+				$query->select('id');
+			}
+		])
+			->with('comments.commenter')
+			->with([
+				'views.viewer' => function ($query) {
+					$query->select(['id', 'name']);
+				}
+			])
+			->with([
+				'shares.sharer' => function ($query) {
+					$query->select(['id', 'name']);
+				}
+			])
+			->withCount(['shares', 'likes', 'views', 'comments'])
+			->whereHas('category', function ($query) {
+				$query->where('status', 1);
+			})
+			->where('status', 1)->where('slug', $slug)->first();
 		$id = $postOrReel->id;
 		$ip = $request->ip();
 

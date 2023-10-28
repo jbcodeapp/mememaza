@@ -14,9 +14,18 @@ class ImageController extends Controller
 
     public function store(Request $request)
     {
-        $path = \Storage::disk('s3')->put('/', $request->file('image'));
+        $validator = \Validator::make($request->all(), [
+            'image' => 'required|file|mimes:jpg,jpeg,png,webp|max:3000',
+        ]);
 
-        return response()->json(['path' => $path]);
+        if ($validator->fails()) {
+            return response()
+                ->json(['statuscode' => false, 'errors' => $validator->errors()->all()]);
+        }
+
+        $params = $this->uploadImage($request, 'image', 'comments');
+
+        return response()->json(['url' => $params['image']]);
     }
     //
 }
