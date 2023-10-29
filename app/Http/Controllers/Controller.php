@@ -91,16 +91,17 @@ class Controller extends BaseController
                 $output = shell_exec($command);
 
                 $gifContents = file_get_contents(public_path($gifVideoPath));
+
                 if (\Storage::disk('s3')->put($gifVideoPath, $gifContents)) {
                     $awsGifPath = \Storage::disk('s3')->url($gifVideoPath);
                     unlink($gifVideoPath);
                 }
                 //system($command);
                 if ($isStory) {
-                    exec("ffmpeg -i $filePath -b 3000000 $croppedFilePath");
+                    exec("ffmpeg -i $filePath -c:a aac $croppedFilePath");
                     //vdo_image
                 } else {
-                    exec("ffmpeg -i $filePath -ab 32 -ss 00:00:00 -t 00:00:28 $croppedFilePath");
+                    exec("ffmpeg -i $filePath -ab 128 -c:a acc -ss 00:00:00 -t 00:00:28 $croppedFilePath");
                 }
 
                 $vidContents = file_get_contents(public_path($croppedFilePath));

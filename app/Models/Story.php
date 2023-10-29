@@ -12,5 +12,5 @@ use App\Traits\Likable;
 
 class Story extends Model
 {
-    use HasFactory, Likeable, Commentable, Viewable, Shareable;
+    use HasFactory, Likable, Commentable, Viewable, Shareable;
 }

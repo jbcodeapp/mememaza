@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Components\Api\CommonManager;
 use App\Models\PostReelIndex;
 use App\Models\Reel;
+use App\Models\Story;
 use Illuminate\Http\Request;
 use Validator, Auth, DB;
 use App\Models\Like;
@@ -70,6 +71,11 @@ class IndexController extends Controller
 			$category->image_path = cdn($category->image);
 		}
 
+		$stories = Story::where('status', 1)
+			->orderByDesc('created_at')
+
+			->get();
+
 		$reels = DB::table('reels')
 			->select(['id', 'slug', 'reel', 'link', 'thumb', 'reel_type', 'created_at'])
 			->where('status', 1)
@@ -104,6 +110,7 @@ class IndexController extends Controller
 			'statuscode' => true,
 			'userid' => $userid,
 			'slug' => $slug,
+			'stories' => $stories,
 			'banners' => $banners,
 			'categories' => $categories,
 			'reels' => $reelsData
