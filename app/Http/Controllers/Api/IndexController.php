@@ -223,21 +223,25 @@ class IndexController extends Controller
 	public function postbyslug(Request $request, $slug, $type)
 	{
 		$page = $request->page ? $request->page : 3;
+		$modalName = '';
 
+		$searchFor = 'slug';
 		if ($type === 'reel') {
 			$modelName = '\App\Models\Reel';
 		} else if ($type === 'post') {
 			$modelName = '\App\Models\Post';
+		} else if ($type === 'story') {
+			$modelName = '\App\Models\Story';
+			$searchFor = 'id';
 		}
 
 		// Create a new array to store the sorted data
 		$sortedData = $this->getSortedData($page, $this->postsLimit);
 
-
 		$previousSlug = null;
 
 		$nextSlug = null;
-		$postOrReel = $modelName::with([
+		$postOrReelQry = $modelName::with([
 			'likes.liker' => function ($query) {
 				$query->select('id');
 			}
@@ -254,10 +258,15 @@ class IndexController extends Controller
 				}
 			])
 			->withCount(['shares', 'likes', 'views', 'comments'])
-			->whereHas('category', function ($query) {
+			->where('status', 1)->where($searchFor, $slug);
+
+		if ($type !== 'story') {
+			$postOrReelQry->whereHas('category', function ($query) {
 				$query->where('status', 1);
-			})
-			->where('status', 1)->where('slug', $slug)->first();
+			});
+		}
+		$postOrReel = $postOrReelQry->first();
+
 		$id = $postOrReel->id;
 		$ip = $request->ip();
 
@@ -283,50 +292,67 @@ class IndexController extends Controller
 				'updated_at' => $date
 			]);
 		}
+		if ($type !== 'story') {
 
-		foreach ($sortedData as $i => $item) {
-			if ($item['slug'] === $slug && $item['type'] === $type) {
+			foreach ($sortedData as $i => $item) {
+				if ($item['slug'] === $slug && $item['type'] === $type) {
 
-				// Create a new array to store the sorted data
-				$currentItem = PostReelIndex::where($type . "_id", $id)
-					->first();
+					// Create a new array to store the sorted data
+					$currentItem = PostReelIndex::where($type . "_id", $id)
+						->first();
 
-				$previousItem = PostReelIndex::where('created_at', '>', $currentItem->created_at)
-					->with(['post', 'reel'])->orderBy('created_at')
-					->first();
+					$previousItem = PostReelIndex::where('created_at', '>', $currentItem->created_at)
+						->with(['post', 'reel'])->orderBy('created_at')
+						->first();
 
-				$nextItem = PostReelIndex::where('created_at', '<', $currentItem->created_at)
-					->with(['post', 'reel'])->orderByDesc('created_at')
-					->first();
+					$nextItem = PostReelIndex::where('created_at', '<', $currentItem->created_at)
+						->with(['post', 'reel'])->orderByDesc('created_at')
+						->first();
 
-				if ($previousItem) {
-					if ($previousItem['reel']) {
-						$prevType = 'reel';
-					} else if ($previousItem['post']) {
-						$prevType = 'post';
-					}
-					$prevSlug = $previousItem[$prevType]['slug'];
 				}
+			}
+		} else {
+			$currentStory = $postOrReel;
+			$previousItem = Story::where('created_at', '>', $currentStory->created_at)
+				->orderBy('created_at')
+				->first();
 
-				if ($nextItem) {
-					if ($nextItem['reel']) {
-						$nextType = 'reel';
-					} else if ($nextItem['post']) {
-						$nextType = 'post';
-					}
-
-					$nxtSlug = $nextItem[$nextType]['slug'];
-				}
-
-				if ($previousItem) {
-					$previousSlug = '/' . $prevType . '/' . $prevSlug;
-				}
-				if ($nextItem) {
-					$nextSlug = '/' . $nextType . '/' . $nxtSlug;
-				}
+			$nextItem = Story::where('created_at', '<', $currentStory->created_at)
+				->orderByDesc('created_at')
+				->first();
+		}
+		if ($previousItem) {
+			if ($previousItem['reel']) {
+				$prevType = 'reel';
+				$prevSlug = $previousItem[$prevType]['slug'];
+			} else if ($previousItem['post']) {
+				$prevType = 'post';
+				$prevSlug = $previousItem[$prevType]['slug'];
+			} else {
+				$prevType = 'story';
+				$prevSlug = $previousItem['id'];
 			}
 		}
 
+		if ($nextItem) {
+			if ($nextItem['reel']) {
+				$nextType = 'reel';
+				$nxtSlug = $nextItem[$nextType]['slug'];
+			} else if ($nextItem['post']) {
+				$nextType = 'post';
+				$nxtSlug = $nextItem[$nextType]['slug'];
+			} else {
+				$nextType = 'story';
+				$nxtSlug = $nextItem['id'];
+			}
+		}
+
+		if ($previousItem) {
+			$previousSlug = '/' . $prevType . '/' . $prevSlug;
+		}
+		if ($nextItem) {
+			$nextSlug = '/' . $nextType . '/' . $nxtSlug;
+		}
 		return response()->json(['obj' => $postOrReel, 'previous' => $previousSlug, 'next' => $nextSlug]);
 	}
 

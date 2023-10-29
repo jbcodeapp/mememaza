@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\Comment;
+use App\Models\Story;
 
 use Validator;
 
@@ -35,6 +35,7 @@ class CommentController extends Controller
             $type = ucfirst($type); // Convert to uppercase
 
             $modelName = "\App\Models\\$type";
+
             $modelInstance = $modelName::find($id);
             $comment = $modelInstance->comment($commentText, $commentType);
 
