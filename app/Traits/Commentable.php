@@ -7,7 +7,8 @@ trait Commentable
     public function comments()
     {
         return $this->hasMany(\App\Models\Comment::class, 'type_id', 'id')
-            ->where('type', $this->getCommentableMorphType());
+            ->where('type', $this->getCommentableMorphType())
+            ->withCount('likes');
     }
 
     public function comment($comment, $commentType)
@@ -17,7 +18,7 @@ trait Commentable
             'type' => $this->getCommentableMorphType(),
             'comment' => $comment,
             'comment_type' => $commentType,
-        ]);
+        ])->load('commenter');
     }
 
     public function getCommentableMorphType()
