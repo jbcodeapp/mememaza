@@ -24,7 +24,7 @@ class CommonManager
 		return Category::select($col)->withCount(['reels', 'posts'])->get();
 	}
 
-	public function getPostsLimit($page, $limit, $slug = null)
+	public function getPostsLimit($page, $limit, $slug = null, $categorySlug = null)
 	{
 		// Create a base query using the Post model
 		$postQuery = Post::with([
@@ -49,8 +49,13 @@ class CommonManager
 				}
 			])
 			->withCount(['shares', 'likes', 'views', 'comments'])
-			->whereHas('category', function ($query) {
+			->whereHas('category', function ($query) use ($categorySlug) {
 				$query->where('status', 1);
+
+				if ($categorySlug) {
+					$query->whereSlug($categorySlug);
+				}
+
 			})
 			->where('status', 1)->orderByDesc('created_at');
 
@@ -76,17 +81,19 @@ class CommonManager
 				}
 			])
 			->withCount(['shares', 'likes', 'views', 'comments'])
-			->whereHas('category', function ($query) {
+			->whereHas('category', function ($query) use ($categorySlug) {
 				$query->where('status', 1);
+				if ($categorySlug) {
+					$query->whereSlug($categorySlug);
+				}
 			})->orderByDesc('created_at');
-
-
 
 		// Apply slug filter if provided
 		if ($slug !== null) {
-			$postQuery->where('slug', $slug);
-			$reelsQuery->where('slug', $slug);
+			$postQuery->whereSlug('slug', $slug);
+			$reelsQuery->whereSlug('slug', $slug);
 		}
+
 
 		// Paginate the results
 		$list = $postQuery->orderBy('created_at')

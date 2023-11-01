@@ -8,10 +8,10 @@ use App\Models\PostReelIndex;
 use App\Models\Reel;
 use App\Models\Story;
 use Illuminate\Http\Request;
-use Validator, Auth, DB;
-use App\Models\Like;
+use DB;
 use App\Models\Banner;
 use App\Models\Post;
+
 use Illuminate\Database\Eloquent\Model;
 
 //use Illuminate\Support\Str;
@@ -33,14 +33,34 @@ class IndexController extends Controller
 	public function getPaginatedPosts(Request $request)
 	{
 		$page = ($request->page > 0) ? $request->page : 1;
-		$totalItems = Post::where('status', 1)
-			->whereHas('category', function ($query) {
+		$categorySlug = $request->category_slug;
+
+		$postBaseQuery = Post::select('id')->where('status', 1);
+
+		$reelBaseQuery = Reel::select('id')->where('status', 1);
+
+
+		$totalItems = $postBaseQuery
+			->whereHas('category', function ($query) use ($categorySlug) {
 				$query->where('status', 1);
-			})->count();
+				if ($categorySlug) {
+					$query->where('slug', $categorySlug);
+				}
+			})
+			->union(
+				$reelBaseQuery
+					->whereHas('category', function ($query) use ($categorySlug) {
+						$query->where('status', 1);
+						if ($categorySlug) {
+							$query->whereSlug($categorySlug);
+						}
+					})
+			)
+			->count();
 
 		$commonManagerObj = CommonManager::getInstance();
 
-		$post = $commonManagerObj->getPostsLimit($page, $this->postsLimit);
+		$post = $commonManagerObj->getPostsLimit($page, $this->postsLimit, null, $categorySlug);
 
 		$postlist = $post['data'];
 		$reels = $post['reels'];

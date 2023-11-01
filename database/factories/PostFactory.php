@@ -19,7 +19,6 @@ class PostFactory extends Factory
     {
         $title = fake()->sentence;
         $imageNumber = random_int(1, 99);
-        $this->wait();
         return [
             'title' => $title,
             'category_id' => fake()->numberBetween(1, 20),
@@ -31,11 +30,8 @@ class PostFactory extends Factory
             'desc' => fake()->paragraph,
             'status' => fake()->boolean,
             'download' => fake()->numberBetween(0, 100),
+            'created_at' => fake()->dateTimeThisYear(now()),
+            'updated_at' => fake()->dateTimeThisYear(now()),
         ];
-    }
-
-    public function wait()
-    {
-        sleep(1);
     }
 }
