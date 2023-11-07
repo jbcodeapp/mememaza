@@ -35,16 +35,15 @@ class IndexController extends Controller
 		$page = ($request->page > 0) ? $request->page : 1;
 		$categorySlug = $request->category_slug;
 
-		$postBaseQuery = Post::select('id')->where('status', 1);
+		$postBaseQuery = Post::select(['id', 'category_id'])->where('status', 1);
 
-		$reelBaseQuery = Reel::select('id')->where('status', 1);
-
+		$reelBaseQuery = Reel::select(['id', 'category_id'])->where('status', 1);
 
 		$totalItems = $postBaseQuery
 			->whereHas('category', function ($query) use ($categorySlug) {
 				$query->where('status', 1);
 				if ($categorySlug) {
-					$query->where('slug', $categorySlug);
+					$query->whereSlug($categorySlug);
 				}
 			})
 			->union(
@@ -87,6 +86,7 @@ class IndexController extends Controller
 		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
 
 		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image', 'categories.created_at']);
+
 		foreach ($categories as $category) {
 			$category->image_path = cdn($category->image);
 		}

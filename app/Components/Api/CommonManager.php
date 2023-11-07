@@ -21,7 +21,20 @@ class CommonManager
 
 	public function getCategories($col = ['*'])
 	{
-		return Category::select($col)->withCount(['reels', 'posts'])->get();
+		return Category::select($col)
+			->withCount([
+				'posts' => function ($query) {
+					$query->where('status', 1);
+				}
+			])
+			->withCount([
+				'reels' => function ($query) {
+					$query->where('status', 1);
+				}
+			])
+			->orderByRaw('posts_count + reels_count DESC')
+			->take(11)
+			->get();
 	}
 
 	public function getPostsLimit($page, $limit, $slug = null, $categorySlug = null)

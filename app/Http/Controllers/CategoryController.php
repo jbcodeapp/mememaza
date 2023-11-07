@@ -11,8 +11,16 @@ class CategoryController extends Controller
     public function categorybyslug(Request $request, $slug)
     {
         $category = Category::whereSlug($slug)
-            ->withCount('posts')
-            ->withCount('reels')
+            ->withCount([
+                'posts' => function ($query) {
+                    $query->where('status', 1);
+                }
+            ])
+            ->withCount([
+                'reels' => function ($query) {
+                    $query->where('status', 1);
+                }
+            ])
             ->firstOrFail();
 
         return response()->json(['obj' => $category]);

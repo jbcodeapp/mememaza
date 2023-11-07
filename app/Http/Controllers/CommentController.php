@@ -17,12 +17,12 @@ class CommentController extends Controller
             'comment_type' => 'required|numeric',
             'image_path' => 'required_if:comment_type,2',
         ]);
+
         if ($validator->fails()) {
             return response()
                 ->json(['statuscode' => false, 'errors' => $validator->errors()->all()]);
         }
         try {
-
             $commentType = $request->input('comment_type');
             if ($commentType == 2) {
                 $commentText = $request->input('comment') . '<br />' . '<img src="' . $request->input('image_path') . '" alt="comment" />';
