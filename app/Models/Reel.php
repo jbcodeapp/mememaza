@@ -30,7 +30,6 @@ class Reel extends Model
         switch ($this->reel_type) {
             case 1:
                 return $this->link;
-
             case 2:
                 return $this->vdo_image;
             case 3:

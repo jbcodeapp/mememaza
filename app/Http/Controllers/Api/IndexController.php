@@ -80,15 +80,11 @@ class IndexController extends Controller
 			$userid = auth('api')->user()->id;
 		}
 		$obj = CommonManager::getInstance();
-		$path = cdn('');
-
-		$path = cdn(PUB . "story/");
-		$currentDate = (new \DateTime)->format('Y-m-d H:i:s');
 
 		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image', 'categories.created_at']);
 
 		foreach ($categories as $category) {
-			$category->image_path = cdn($category->image);
+			$category->image_path = "https://memesmaza.com/$category->image";
 		}
 
 		$stories = Story::where('status', 1)
