@@ -35,6 +35,7 @@ jobs:
       - name: Set up .env variables
         run: |
           echo "Copying environment variables from Github.." 
+          echo "" >> .env
           echo "APP_URL=https://admin.memesmaza.com/" >> .env
           echo "APP_ENV=production" >> .env
           echo "APP_DEBUG=false" >> .env
