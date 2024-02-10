@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Storage Files/Logs Backup
-        run: sudo rsync -av --progress /var/www/admin.memesmaza.com/storage /var/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
+        run: sudo rsync -av --progress /var/www/html/admin.memesmaza.com/storage /var/www/html/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
         continue-on-error: true
       - name: Check rsync exit code
         run: |
@@ -55,9 +55,9 @@ jobs:
           echo "Configuration cache cleared!"
 
       - name: Restore Storage Files/Logs Backup
-        run: sudo rsync -av --progress  /var/admin.memesmaza.com/storage.temp/storage /var/admin.memesmaza.com/mememaza
+        run: sudo rsync -av --progress  /var/www/html/admin.memesmaza.com/storage.temp/storage /var/www/html/admin.memesmaza.com
       - name: Delete Files/Logs Backup
-        run: sudo rm -r  /var/admin.memesmaza.com/storage.temp
+        run: sudo rm -r  /var/www/html/admin.memesmaza.com/storage.temp
       - name: Storage Link
         run: php artisan storage:link
       - name: Directory Permissions
