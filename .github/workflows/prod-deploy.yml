@@ -16,9 +16,10 @@ jobs:
     steps: 
       - name: Change To Main Folder
         run:  cd /var/www/html/admin.memesmaza.com
-
+      - name: Transfer Latest Code
+        run: git pull origin production
       - name: Storage Files/Logs Backup
-        run: sudo rsync -av --progress /var/www/html/admin.memesmaza.com/storage /var/www/html/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
+        run: sudo rsync -av --progress /var/www/html/admin.memesmaza.com/storage /var/www/html/storage.temp --exclude debugbar --exclude framework
         continue-on-error: true
       - name: Check rsync exit code
         run: |
@@ -28,7 +29,7 @@ jobs:
             echo "rsync failed"
             exit 1
           fi
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3  
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
@@ -62,9 +63,9 @@ jobs:
           echo "Configuration cache cleared!"
 
       - name: Restore Storage Files/Logs Backup
-        run: sudo rsync -av --progress  /var/www/html/admin.memesmaza.com/storage.temp/storage /var/www/html/admin.memesmaza.com
+        run: sudo rsync -av --progress  /var/www/html/storage.temp/storage /var/www/html/admin.memesmaza.com
       - name: Delete Files/Logs Backup
-        run: sudo rm -r  /var/www/html/admin.memesmaza.com/storage.temp
+        run: sudo rm -r  /var/www/html/storage.temp
       - name: Storage Link
         run: php artisan storage:link
       - name: Directory Permissions
