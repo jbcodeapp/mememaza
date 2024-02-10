@@ -11,6 +11,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Change To Main Folder
+        run:  cd /var/www/html/admin.memesmaza.com
+
       - name: Storage Files/Logs Backup
         run: sudo rsync -av --progress /var/www/html/admin.memesmaza.com/storage /var/www/html/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
         continue-on-error: true
