@@ -11,9 +11,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
-        env:
-          runner: self-hosted
       - name: Storage Files/Logs Backup
         run: sudo rsync -av --progress /var/www/admin.memesmaza.com/storage /var/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
         continue-on-error: true
