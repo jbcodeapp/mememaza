@@ -14,12 +14,8 @@ jobs:
       - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
         env:
           runner: self-hosted
-        with:
-          php-version: "8.2"
-      - name: Permission setup
-        run: sudo chown -R $USER:$USER /var/www/actions-runner/_work/mememaza
       - name: Storage Files/Logs Backup
-        run: sudo rsync -av --progress /var/www/mememaza/storage /var/www/storage.temp --exclude debugbar --exclude framework
+        run: sudo rsync -av --progress /var/www/admin.memesmaza.com/storage /var/admin.memesmaza.com/storage.temp --exclude debugbar --exclude framework
         continue-on-error: true
       - name: Check rsync exit code
         run: |
@@ -36,7 +32,7 @@ jobs:
       - name: Set up .env variables
         run: |
           echo "Copying environment variables from Github.." 
-          echo "APP_URL=https://santrash.com/" >> .env
+          echo "APP_URL=https://admin.memesmaza.com/" >> .env
           echo "APP_ENV=production" >> .env
           echo "APP_DEBUG=false" >> .env
           echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
@@ -62,9 +58,9 @@ jobs:
           echo "Configuration cache cleared!"
 
       - name: Restore Storage Files/Logs Backup
-        run: sudo rsync -av --progress  /var/www/storage.temp/storage /var/www/mememaza
+        run: sudo rsync -av --progress  /var/admin.memesmaza.com/storage.temp/storage /var/admin.memesmaza.com/mememaza
       - name: Delete Files/Logs Backup
-        run: sudo rm -r  /var/www/storage.temp
+        run: sudo rm -r  /var/admin.memesmaza.com/storage.temp
       - name: Storage Link
         run: php artisan storage:link
       - name: Directory Permissions
