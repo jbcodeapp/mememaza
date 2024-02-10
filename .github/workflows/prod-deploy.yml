@@ -9,8 +9,11 @@ on:
 jobs:
   laravel-setup:
     runs-on: self-hosted
-
-    steps:
+    defaults:
+        run:
+          shell: bash
+          working-directory: /var/www/html/admin.memesmaza.com          
+    steps: 
       - name: Change To Main Folder
         run:  cd /var/www/html/admin.memesmaza.com
 
