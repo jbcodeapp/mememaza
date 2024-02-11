@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory(10)->create();
         \App\Models\Category::factory(20)->create();
         \App\Models\Post::factory(99)->create();
-        \App\Models\Reel::factory(50)->create();
 
         \App\Models\Admin\Admin::create([
             'name' => 'Admin',
