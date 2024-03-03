@@ -84,7 +84,7 @@ class IndexController extends Controller
 		$categories = $obj->getCategories(['categories.id', 'categories.name', 'categories.slug', 'categories.image', 'categories.created_at']);
 
 		foreach ($categories as $category) {
-			$category->image_path = "https://memesmaza.com/$category->image";
+			$category->image_path = $category->image;
 		}
 
 		$stories = Story::where('status', 1)
