@@ -45,8 +45,8 @@ class Controller extends BaseController
 
             $fileContents = file_get_contents(public_path($filePath));
 
-            if (\Storage::disk('s3')->put($filePath, $fileContents)) {
-                $awsPath = \Storage::disk('s3')->url($filePath);
+            if (\Storage::disk('local')->put($filePath, $fileContents)) {
+                $awsPath = \Storage::disk('local')->url($filePath);
                 unlink($filePath);
                 // Free up memory
                 imagedestroy($image);
@@ -92,8 +92,8 @@ class Controller extends BaseController
 
                 $gifContents = file_get_contents(public_path($gifVideoPath));
 
-                if (\Storage::disk('s3')->put($gifVideoPath, $gifContents)) {
-                    $awsGifPath = \Storage::disk('s3')->url($gifVideoPath);
+                if (\Storage::disk('local')->put($gifVideoPath, $gifContents)) {
+                    $awsGifPath = \Storage::disk('local')->url($gifVideoPath);
                     unlink($gifVideoPath);
                 }
                 //system($command);
