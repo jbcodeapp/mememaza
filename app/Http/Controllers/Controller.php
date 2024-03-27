@@ -12,7 +12,7 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function uploadImage($request, $field, $storage_dir_key)
-    {
+        {
         $params = [];
 
         if ($request->hasFile($field)) {
@@ -46,12 +46,14 @@ class Controller extends BaseController
             $fileContents = file_get_contents(public_path($filePath));
 
             if (\Storage::disk('local')->put($filePath, $fileContents)) {
-                $awsPath = \Storage::disk('local')->url($filePath);
-                unlink($filePath);
-                // Free up memory
-                imagedestroy($image);
-                $params[$field] = $awsPath;
+                // $awsPath = \Storage::disk('local')->url($filePath);
+                // unlink($filePath);
+                // // Free up memory
+                // imagedestroy($image);
+                // $params[$field] = $awsPath;
+                $params[$field] = env('APP_URL')."/".$filePath;
             }
+            
 
         }
 
@@ -81,45 +83,48 @@ class Controller extends BaseController
             }
 
             $filePath = $path . '/' . $file_name_extension;
-            $croppedFilePath = $path . '/cropped_' . $file_name_extension;
 
+            $croppedFilePath = $path . '/' . $file_name_extension;
+            
             $gifVideoPath = $path . '/gif_' . preg_replace("/\.[^.]+$/", "", $file_name_extension) . '.gif';
-
+                
             // Move the uploaded video to the storage directory
             if ($file->move($path, $file_name_extension)) {
-                $command = 'ffmpeg -i ' . $filePath . ' -vf "fps=24,scale=160:-1" -t 3 ' . $gifVideoPath;
-                $output = shell_exec($command);
+                // $command = 'C:\laragon\bin\ffmpeg\ffmpeg.exe -i ' . $filePath . ' -vf "fps=24,scale=160:-1" -t 3 ' . $gifVideoPath;
+                // \Log::debug("This command for convert". $command);
+               
+                // $output = shell_exec($command);
 
-                $gifContents = file_get_contents(public_path($gifVideoPath));
+                // $gifContents = file_get_contents(public_path($gifVideoPath));
+                // \Log::debug("gif .". public_path($gifVideoPath));
 
-                if (\Storage::disk('local')->put($gifVideoPath, $gifContents)) {
-                    $awsGifPath = \Storage::disk('local')->url($gifVideoPath);
-                    unlink($gifVideoPath);
-                }
+                // if (\Storage::disk('local')->put($gifVideoPath, $gifContents)) {
+                //     $awsGifPath = \Storage::disk('local')->url($gifVideoPath);
+                //     // \Log::debug("gif path.".$gifVideoPath);
+                //     unlink($gifVideoPath);
+                // }
                 //system($command);
                 if ($isStory) {
-                    exec("ffmpeg -i $filePath -c:a aac $croppedFilePath");
+                    exec( "C:\\laragon\\bin\\ffmpeg\\ffmpeg.exe -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+                    // \Log::debug("story");
                     //vdo_image
                 } else {
-                    exec("ffmpeg -i $filePath -ab 128 -c:a acc -ss 00:00:00 -t 00:00:28 $croppedFilePath");
+                    exec("C:\\laragon\\bin\\ffmpeg\\ffmpeg.exe -i $filePath -vf scale=320:-1 $gifVideoPath");
+                    // \Log::debug("reel");
                 }
 
                 $vidContents = file_get_contents(public_path($croppedFilePath));
+                // \Log::debug("vid content: ". public_path($croppedFilePath));
 
-                if (\Storage::disk('s3')->put($croppedFilePath, $vidContents)) {
-                    $awsCroppedFilePath = \Storage::disk('s3')->url($croppedFilePath);
-                    unlink($croppedFilePath);
-                }
-
-                try {
-                    unlink($filePath);
-                } catch (\Exception $e) {
-
-                }
+                // if (\Storage::disk('local')->put($croppedFilePath, $vidContents)) {
+                    // $awsCroppedFilePath = \Storage::disk('local')->url($croppedFilePath);
+                    // \Log::debug("aws content: 123");
+                    // unlink($croppedFilePath);
+                // }
             }
 
-            $params[$field] = $awsCroppedFilePath;
-            $params['vdo_image'] = $awsGifPath;
+            $params[$field] = env('APP_URL')."/".$croppedFilePath;
+            $params['vdo_image'] = env('APP_URL')."/".$gifVideoPath;
         }
 
         return $params;

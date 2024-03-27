@@ -267,11 +267,11 @@ var ReelManager = {
 			CommonManager.validateFields('.',response.errors, 'a');
 			return false;
 		} else if(response.status == 'error') {
-			alert(response.msg);
+			console.log(response.msg);
 			return false;
 		} else if(response.status == 'success') {
 			document.getElementById('reel_form').reset();
-			alert(response.msg);
+			console.log(response.msg);
 			location.href = url+'/reels';
 		}
 		
