@@ -399,7 +399,7 @@ class IndexController extends BaseController
 
 	public function post_handle(Request $request)
 	{
-		if ($request->ajax()) {
+            		if ($request->ajax()) {
 			$id = ($request->id > 0) ? $request->id : 0;
 			$rules = array(
 				'title' => 'required',
@@ -433,16 +433,16 @@ class IndexController extends BaseController
 			if ($id > 0) {
 				if ($request->hasFile('img')) {
 					$image = $this->uploadPostImage($request);
-
+										
 					if ($image === false) {
 						return response()->json(['status' => 'error', 'msg' => 'Image not uploaded']);
 					} else {
 						$params['image'] = $image;
-					}
+											}
 				}
 			} else {
 				$image = $this->uploadPostImage($request);
-
+				
 				if ($image === false) {
 					return response()->json(['status' => 'error', 'msg' => 'Image not uploaded']);
 				}
@@ -454,14 +454,14 @@ class IndexController extends BaseController
 			if ($id > 0) {
 
 				$status = $commonManagerObj->updatePostById($id, $params);
-				if ($status) {
+								if ($status) {
 					return response()->json(['status' => 'success', 'msg' => 'Successfully Updated']);
 				}
 
 			} else {
 				$params['slug'] = $this->generateSlug($request->title);
 				$status = $commonManagerObj->insert_post($params);
-
+				
 				if ($status) {
 					return response()->json(['status' => 'success', 'msg' => 'Successfully Save']);
 				}
@@ -473,7 +473,7 @@ class IndexController extends BaseController
 
 	private function uploadPostImage($request)
 	{
-		return $this->uploadImage($request, 'img', 'posts')['img'];
+				return $this->uploadImage($request, 'img', 'posts')['img'];
 	}
 	/* Post End */
 
@@ -754,7 +754,7 @@ class IndexController extends BaseController
 
 	public function story_handle(Request $request)
 	{
-		if ($request->ajax()) {
+			if ($request->ajax()) {
 			$id = ($request->id > 0) ? $request->id : 0;
 			$story_type = $request->story_type;
 			$rules = array(
