@@ -754,7 +754,7 @@ class IndexController extends BaseController
 
 	public function story_handle(Request $request)
 	{
-		if ($request->ajax()) {
+			if ($request->ajax()) {
 			$id = ($request->id > 0) ? $request->id : 0;
 			$story_type = $request->story_type;
 			$rules = array(

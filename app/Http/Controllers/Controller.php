@@ -72,7 +72,7 @@ class Controller extends BaseController
             $file = $request->file($field);
 
             // Generate a unique file name with a timestamp
-            $file_name_extension = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $file_name_extension = time() . '_' . str_replace([' ', '-','(',')'], '_', $file->getClientOriginalName());
 
             // Define the path to the storage directory
             $path = 'storage/' . $prefix_directory . '/videos';
@@ -104,12 +104,21 @@ class Controller extends BaseController
                 //     unlink($gifVideoPath);
                 // }
                 //system($command);
+
                 if ($isStory) {
-                    exec( "C:\\laragon\\bin\\ffmpeg\\ffmpeg.exe -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+                        $test = ( env('FFMPEG_FULL_PATH'). " ". " -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+                        \Log::debug("ffmpeg path 1 " . $test);
+
+                    exec( env('FFMPEG_FULL_PATH'). " ". " -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+
                     // \Log::debug("story");
                     //vdo_image
                 } else {
-                    exec("C:\\laragon\\bin\\ffmpeg\\ffmpeg.exe -i $filePath -vf scale=320:-1 $gifVideoPath");
+                     $test = (env('FFMPEG_FULL_PATH'). " " ."-i $filePath -vf scale=320:-1 $gifVideoPath");
+                        \Log::debug("ffmpeg path 2 " . $test);
+                        
+                    exec(env('FFMPEG_FULL_PATH'). " " ."-i $filePath -vf scale=320:-1 $gifVideoPath");
+
                     // \Log::debug("reel");
                 }
 
