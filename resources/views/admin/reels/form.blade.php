@@ -5,10 +5,13 @@
 	$button = 'Create';
 	$vdo = $src = $image = $type ='';
 	$reel = $reel_type = $link = $category_id = null;
+	$title = $image = $desc = $category_id = '';
+
 	if($id > 0) {
 		if($obj != null) {
 			$button = 'Update';
 			$reel = $obj->reel;
+			$desc = $obj->desc;
 			$reel_type = $obj->reel_type;
 			$link = $obj->link;
 			$category_id = $obj->category_id;
@@ -128,6 +131,15 @@
 							</div>
 							
 						  </div>
+						</div>
+
+						<div class="col-12">
+							<div class="form-group">
+								<label for="exampleInputEmail1">Desc</label>
+								<textarea id="summernote" name="desc">
+								{{ $desc }}
+								</textarea>
+							</div>
 						</div>
 						
 						<div class="col-12">
@@ -321,6 +333,17 @@
 			}
 		});
 		ReelManager.init();
+		
+	});
+
+	$(function () {
+			
+			$('#summernote').summernote()
+		
+		});
+	$(document).ready(function() {
+		
+		PostManager.init();
 		
 	});
 </script>

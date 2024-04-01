@@ -160,7 +160,7 @@ class IndexController extends BaseController
 				$rules['videolink'] = 'required';
 			} else if ($request->reel_type == 2) { //video
 				//if($request->hasFile('video')) {
-				$rules['video'] = 'required|mimes:mp4,ogx,oga,ogv,ogg,webm,3gp,avi|max:20000';
+				$rules['video'] = 'required|mimes:mp4,ogx,oga,ogv,ogg,webm,3gp,avi|max:100000';
 				//$rules['thumb'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
 				//}
 
