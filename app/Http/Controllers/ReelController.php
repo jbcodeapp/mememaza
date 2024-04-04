@@ -45,6 +45,7 @@ class ReelController extends Controller
                 'meta_title' => 'required',
                 'meta_keyword' => 'required',
                 'meta_desc' => 'required',
+                'desc' => 'required',
                 'category_id' => 'required',
                 'reel_type' => 'required'
             );
@@ -87,6 +88,8 @@ class ReelController extends Controller
                 $reel->meta_title = $request->meta_title;
                 $reel->meta_keyword = $request->meta_keyword;
                 $reel->meta_desc = $request->meta_desc;
+                $reel->desc = $request->desc;
+
                 if ($reel->save()) {
                     $reel->slug = Str::slug($request->name . '_' . $reel->id);
                     $reel->saveQuietly();

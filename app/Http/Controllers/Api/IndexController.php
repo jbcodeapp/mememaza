@@ -426,7 +426,8 @@ class IndexController extends Controller
 			$preExistingLike = $item->likes()->where('user_id', auth()->user()->id)->first();
 
 			if ($preExistingLike) {
-				$preExistingLike->delete();
+				// $preExistingLike->delete();
+				$preExistingLike->each->delete();
 				return response()->json(['status' => 'success']);
 			}
 			try {
