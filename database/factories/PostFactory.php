@@ -21,7 +21,7 @@ class PostFactory extends Factory
         $imageNumber = random_int(1, 99);
         return [
             'title' => $title,
-            'category_id' => fake()->numberBetween(1, 20),
+            'category_id' => fake()->numberBetween(1, 10),
             'slug' => Str::slug($title),
             'image' => config('app.url') . "/faker/images/posts/image_$imageNumber.jpg",
             'meta_title' => fake()->text,
