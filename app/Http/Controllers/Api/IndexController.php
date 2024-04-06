@@ -34,6 +34,7 @@ class IndexController extends Controller
 	{
 		$page = ($request->page > 0) ? $request->page : 1;
 		$categorySlug = $request->category_slug;
+		$search = $request->search ?? null;
 
 		$postBaseQuery = Post::select(['id', 'category_id'])->where('status', 1);
 
@@ -59,7 +60,7 @@ class IndexController extends Controller
 
 		$commonManagerObj = CommonManager::getInstance();
 
-		$post = $commonManagerObj->getPostsLimit($page, $this->postsLimit, null, $categorySlug);
+		$post = $commonManagerObj->getPostsLimit($page, $this->postsLimit, null, $categorySlug, $search);
 
 		$postlist = $post['data'];
 		$reels = $post['reels'];
@@ -426,8 +427,7 @@ class IndexController extends Controller
 			$preExistingLike = $item->likes()->where('user_id', auth()->user()->id)->first();
 
 			if ($preExistingLike) {
-				// $preExistingLike->delete();
-				$preExistingLike->each->delete();
+				$preExistingLike->delete();
 				return response()->json(['status' => 'success']);
 			}
 			try {
