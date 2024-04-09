@@ -91,8 +91,7 @@ class Controller extends BaseController
             // Move the uploaded video to the storage directory
             if ($file->move($path, $file_name_extension)) {
                 // $command = 'C:\laragon\bin\ffmpeg\ffmpeg.exe -i ' . $filePath . ' -vf "fps=24,scale=160:-1" -t 3 ' . $gifVideoPath;
-                // \Log::debug("This command for convert". $command);
-               
+                // $command =( env('FFMPEG_FULL_PATH') ." " ." -i $filePath  -vf fps=24,scale=160:-1 -t 3  $gifVideoPath");              
                 // $output = shell_exec($command);
 
                 // $gifContents = file_get_contents(public_path($gifVideoPath));
