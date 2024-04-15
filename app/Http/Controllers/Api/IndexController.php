@@ -136,16 +136,26 @@ class IndexController extends Controller
 
 	public function search(Request $request, $search)
 	{
-		$params = [];
-		$params[] = ['id' => 0, 'name' => 'Cobol'];
-		$params[] = ['id' => 1, 'name' => 'JavaScript'];
-		$params[] = ['id' => 2, 'name' => 'Basic'];
-		$params[] = ['id' => 3, 'name' => 'PHP'];
-		$params[] = ['id' => 4, 'name' => 'Java'];
+		// $params = [];
+		// $params[] = ['id' => 0, 'name' => 'Cobol'];
+		// $params[] = ['id' => 1, 'name' => 'JavaScript'];
+		// $params[] = ['id' => 2, 'name' => 'Basic'];
+		// $params[] = ['id' => 3, 'name' => 'PHP'];
+		// $params[] = ['id' => 4, 'name' => 'Java'];
 		//return response()->json($params);
 
-		$data = DB::table('posts')->select('id', 'title as name', 'slug')->where('title', 'LIKE', '%' . $search . '%')->limit(10)->get();
-
+		// $data = DB::table('posts')->select('id', 'title as name', 'slug')->where('title', 'LIKE', '%' . $search . '%')->orWhere('category_id', 'LIKE', '%' . $search . '%')->orWhere('meta_keyword', 'LIKE', '%' . $search . '%')->limit(10)->get();
+		
+		$data = DB::table('posts')
+		->select('posts.*')
+		->leftJoin('categories', 'posts.category_id', '=', 'categories.id')
+		->where(function($query) use ($search) {
+			$query->where('posts.title', 'LIKE', '%' . $search . '%')
+				  ->orWhere('posts.meta_keyword', 'LIKE', '%' . $search . '%')
+				  ->orWhere('categories.slug', 'LIKE', '%' . $search . '%');
+		})
+		->get();
+		// dd($data);
 		return response()->json($data);
 
 	}
@@ -239,7 +249,7 @@ class IndexController extends Controller
 
 	public function postbyslug(Request $request, $slug, $type)
 	{
-		$page = $request->page ? $request->page : 3;
+		$page = $request->page ? $request->page : 1;
 		$modalName = '';
 
 		$searchFor = 'slug';
@@ -253,10 +263,9 @@ class IndexController extends Controller
 		}
 
 		// Create a new array to store the sorted data
-		$sortedData = $this->getSortedData($page, $this->postsLimit);
+		$sortedData = $this->getSortedData($page, 200);
 
 		$previousSlug = null;
-
 		$nextSlug = null;
 		$postOrReelQry = $modelName::with([
 			'likes.liker' => function ($query) {
@@ -283,7 +292,6 @@ class IndexController extends Controller
 			});
 		}
 		$postOrReel = $postOrReelQry->first();
-
 		$id = $postOrReel->id;
 		$ip = $request->ip();
 
@@ -310,8 +318,10 @@ class IndexController extends Controller
 			]);
 		}
 		if ($type !== 'story') {
-
+			
+			
 			foreach ($sortedData as $i => $item) {
+			
 				if ($item['slug'] === $slug && $item['type'] === $type) {
 
 					// Create a new array to store the sorted data
