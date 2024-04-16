@@ -152,7 +152,7 @@ class IndexController extends Controller
 		->where(function($query) use ($search) {
 			$query->where('posts.title', 'LIKE', '%' . $search . '%')
 				  ->orWhere('posts.meta_keyword', 'LIKE', '%' . $search . '%')
-				  ->orWhere('categories.slug', 'LIKE', '%' . $search . '%');
+				  ->orWhere('categories.name', 'LIKE', '%' . $search . '%');
 		})
 		->get();
 		// dd($data);

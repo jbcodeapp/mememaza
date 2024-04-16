@@ -113,8 +113,8 @@ class CommonManager
 			->orderByDesc('created_at');
 
 			if($search != null ){
-				$postQuery->where('title', 'LIKE', '%' . $search . '%');
-				$reelsQuery->where('reel', 'LIKE', '%' . $search . '%');
+				$postQuery->where('title', 'LIKE', '%' . $search . '%')->orWhere('slug', 'LIKE', '%' . $search . '%')->orWhere('posts.meta_keyword', 'LIKE', '%' . $search . '%');
+				$reelsQuery->where('reel', 'LIKE', '%' . $search . '%')->orWhere('slug', 'LIKE', '%' . $search . '%')->orWhere('reels.meta_keyword', 'LIKE', '%' . $search . '%');
 			}
 
 		// Apply slug filter if provided
