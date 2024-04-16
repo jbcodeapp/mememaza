@@ -37,7 +37,7 @@ class CommonManager
 			->get();
 	}
 
-	public function getPostsLimit($page, $limit, $slug = null, $categorySlug = null)
+	public function getPostsLimit($page, $limit, $slug = null, $categorySlug = null, $search = null)
 	{
 		// Create a base query using the Post model
 		$postQuery = Post::with([
@@ -70,6 +70,11 @@ class CommonManager
 				}
 
 			})
+			// search
+			// ->whereHas('search', function ($query) use ($search) {
+			// 	$query->where('title', 'LIKE', '%' . $search . '%');
+			// })
+
 			->where('status', 1)->orderByDesc('created_at');
 
 		$reelsQuery = Reel::with([
@@ -99,7 +104,18 @@ class CommonManager
 				if ($categorySlug) {
 					$query->whereSlug($categorySlug);
 				}
-			})->orderByDesc('created_at');
+			})
+			// search
+			// ->whereHas('search', function ($query) use ($search) {
+			// 	$query->where('title', 'LIKE', '%' . $search . '%');
+			// })
+			
+			->orderByDesc('created_at');
+
+			if($search != null ){
+				$postQuery->where('title', 'LIKE', '%' . $search . '%')->orWhere('slug', 'LIKE', '%' . $search . '%')->orWhere('posts.meta_keyword', 'LIKE', '%' . $search . '%');
+				$reelsQuery->where('reel', 'LIKE', '%' . $search . '%')->orWhere('slug', 'LIKE', '%' . $search . '%')->orWhere('reels.meta_keyword', 'LIKE', '%' . $search . '%');
+			}
 
 		// Apply slug filter if provided
 		if ($slug !== null) {

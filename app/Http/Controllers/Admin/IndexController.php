@@ -764,16 +764,16 @@ class IndexController extends BaseController
 
 			if ($id > 0) {
 				if ($story_type == 1) {
-					$rules['story'] = 'mimes:jpeg,jpg,png,gif,webp|max:10000';
+					$rules['story'] = 'mimes:jpeg,jpg,png,gif,webp|max:90000';
 				} else if ($story_type == 2) {
-					$rules['story'] = 'mimes:mp4,webm|max:10000';
+					$rules['story'] = 'mimes:mp4,webm|max:90000';
 				}
 			} else {
 				$rules['time'] = 'required';
 				if ($story_type == 1) {
-					$rules['story'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:10000';
+					$rules['story'] = 'required|mimes:jpeg,jpg,png,gif,webp|max:90000';
 				} else if ($story_type == 2) {
-					$rules['story'] = 'required|mimes:mp4,webm|max:10000';
+					$rules['story'] = 'required|mimes:mp4,webm|max:90000';
 				}
 			}
 
