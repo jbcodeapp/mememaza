@@ -50,6 +50,12 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'submitResetPas
 
 // 	dd($post);
 // });
+
+Route::get('/anonymous', function () {
+   \Artisan::call('users:like');
+   return "<h1>Anonymous Liked new posts and reels successfully!</h1>";
+});
+
 Route::get('/', [AdminController::class, 'index'])->name('login');
 Route::post('/alogin', [AdminController::class, 'login'])->name('admin.login');
 Route::get('/dashboard', [DashboardController::class, 'dashboard']);

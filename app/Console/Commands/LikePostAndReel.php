@@ -37,17 +37,24 @@ class LikePostAndReel extends Command
             $modelType = "App\Models\\".$modal;
 		    $mod = new $modelType;
             // $Items = $mod::where('created_at', '>', now()->subMinutes(15))->get();
-            $Items = $mod::inRandomOrder()->limit(2)->get();
+            $Items = $mod::inRandomOrder()->limit(10)->get();
             foreach ($Items as $item) {
-                Like::create([
+                // Like::create([
+                //     'type' => $modal,
+                //     'type_id' => $item->id,
+                //     'user_id' => rand(1,20),
+                // ]);
+
+                Like::updateOrCreate([
                     'type' => $modal,
                     'type_id' => $item->id,
                     'user_id' => rand(1,20),
                 ]);
+                
             }
         }        
         
-        $this->info('Liked new posts and reels  successfully!');
+        $this->info('Anonymous Liked new posts and reels successfully!');
         return Command::SUCCESS;
     }
     

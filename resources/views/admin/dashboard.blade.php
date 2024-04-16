@@ -84,6 +84,16 @@
         </div>
         <!-- /.row -->
         <!-- Main row -->
+
+        <div class="col-12">
+          <div class="form-group">
+          <div class="card-">
+              <a class="btn btn-primary" href="{{ url('/anonymous') }}">
+              Anonymous Likes
+              </a>
+          </div>
+          </div>
+        </div>
         
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
