@@ -375,6 +375,45 @@ var BannerManager = {
 	
 }
 
+var AdvertisementManager = {
+    handleFormResponse: function(response, extraData) {
+        $('.err').remove();
+        var current = extraData.current;
+        current.find(":submit").html(current.find(":submit").attr('data-text')).prop('disabled', false);
+        if (response.status == 'errors') {
+            CommonManager.validateFields('.', response.errors, 'a');
+            return false;
+        } else if (response.status == 'error') {
+            alert(response.msg);
+            return false;
+        } else if (response.status == 'success') {
+            document.getElementById('advertisements_form').reset();
+            alert(response.msg);
+            location.href = url + '/advertisements';
+        }
+
+
+        //location.href = url+'/categories';
+    },
+
+    init: function() {
+        _.on('submit', '#advertisements_form', function(e) {
+            $('.err').remove();
+            var url = $('#advertisements_form').attr('action');
+
+            var current = $(this);
+            current.find(":submit").html('Loading...').prop('disabled', true);
+            var formdata = new FormData(this);
+
+            CommonManager.ajaxupload(url, AdvertisementManager.handleFormResponse, 'post', formdata, 'json', { 'current': current });
+            return false;
+        });
+
+    }
+
+}
+
+
 var StoryManager = {
 	handleFormResponse:function(response, extraData) {
 		$('.err').remove();

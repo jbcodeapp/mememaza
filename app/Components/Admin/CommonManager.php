@@ -149,6 +149,37 @@ class CommonManager
 		return DB::table('banners')->where('id', $id)->update($params);
 	}
 
+	// advertisements
+	public function getAdvertisementById($id, $col = ['*'])
+	{
+		return DB::table('advertisements')->select($col)->where('id', $id)->first();
+	}
+
+	public function insert_advertisements($params, $id = false)
+	{
+		$current_date = date('Y-m-d H:i:s');
+		$params['created_at'] = $current_date;
+		$params['updated_at'] = $current_date;
+		if ($id === true) {
+			$id = DB::table('advertisements')->insertGetId($params);
+			return $id;
+		}
+		$status = DB::table('advertisements')->insert($params);
+
+		if ($status) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function updateadvertisementsById($id, $params)
+	{
+		$current_date = date('Y-m-d H:i:s');
+		$params['updated_at'] = $current_date;
+		return DB::table('advertisements')->where('id', $id)->update($params);
+	}
+
 	////////////////////
 
 	public function getStoryById($id, $col = ['*'])

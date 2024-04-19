@@ -39,6 +39,10 @@
 		  <li class="nav-item menu-open">
             <a href="{{ url('banner') }}" class="nav-link {{ (request()->is('banner')) ? 'active' : '' }}"><i class="nav-icon fas fa-tachometer-alt"></i><p>Banner</p></a>
           </li>
+
+      <li class="nav-item menu-open">
+            <a href="{{ url('advertisements') }}" class="nav-link {{ (request()->is('advertisements')) ? 'active' : '' }}"><i class="nav-icon fas fa-tachometer-alt"></i><p>Advertisement</p></a>
+          </li>
 		  
 		  <li class="nav-item menu-open">
             <a href="{{ url('story') }}" class="nav-link {{ (request()->is('story')) ? 'active' : '' }}"><i class="nav-icon fas fa-tachometer-alt"></i><p>Story</p></a>

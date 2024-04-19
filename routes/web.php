@@ -83,6 +83,11 @@ Route::get('/banner_ajax', [IndexController::class, 'banner_ajax']);
 Route::get('/banner_form/{id}', [IndexController::class, 'banner_form']);
 Route::post('/banner_handle', [IndexController::class, 'banner_handle']);
 
+Route::get('/advertisements', [IndexController::class, 'advertisements']);
+Route::get('/advertisements_ajax', [IndexController::class, 'advertisements_ajax']);
+Route::get('/advertisements_form/{id}', [IndexController::class, 'advertisements_form']);
+Route::post('/advertisements_handle', [IndexController::class, 'advertisements_handle']);
+
 Route::get('/story', [IndexController::class, 'story']);
 Route::get('/story_ajax', [IndexController::class, 'story_ajax']);
 Route::get('/story_form/{id}', [IndexController::class, 'story_form']);
