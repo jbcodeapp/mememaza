@@ -756,6 +756,7 @@ class IndexController extends BaseController
 				'meta_keyword' => 'nullable|max:255',
 				'meta_desc' => 'nullable|max:255',
 				'link' => 'nullable|url|max:255',
+				'type' => 'default:advertisements',
 				// 'status' => 'required|boolean',
 			);
 
@@ -776,6 +777,7 @@ class IndexController extends BaseController
 				'meta_desc' => $request->meta_desc,
 				'link' => $request->link,
 				'status' => $request->status ? 1 : 0,
+				'type' => $request->type ?? 'advertisements',
 			];
 
 			if ($id > 0) {

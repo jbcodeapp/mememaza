@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('meta_desc')->nullable();
             $table->string('link')->nullable();
             $table->boolean('status')->default(1);
-            $table->string('type', 255);
+            $table->string('type', 255)->default('advertisements');
             $table->timestamps();
         });
     }

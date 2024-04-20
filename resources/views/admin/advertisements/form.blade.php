@@ -3,7 +3,7 @@
 @section('content')
 <?php
 	$button = 'Create';
-	// $src = $position = '';
+	$src = $position = '';
 	if($id > 0) {
 		if($obj != null) {
 			$src = cdn(PUB.'uploads/advertisements/'.$obj->advertisement);
