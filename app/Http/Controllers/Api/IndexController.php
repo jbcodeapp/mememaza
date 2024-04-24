@@ -382,6 +382,13 @@ class IndexController extends Controller
 		}
 		return response()->json(['obj' => $postOrReel, 'previous' => $previousSlug, 'next' => $nextSlug]);
 	}
+	
+	public function getAdvertisements(Request $request)
+	{
+		$advertisements = DB::table('advertisements')->inRandomOrder()->limit(1)->get();
+
+		return  response()->json($advertisements);
+	}
 
 	public function reelbyslug(Request $request, $slug)
 	{

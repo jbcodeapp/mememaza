@@ -641,6 +641,189 @@ class IndexController extends BaseController
 	}
 	/* Banner End */
 
+	/* advertisements Start */
+	public function advertisements()
+	{
+		return view('admin.advertisements.index');
+	}
+
+	public function advertisements_form(Request $request, $id)
+	{
+		$data = $this->get_advertisements($id);
+		if ($data['obj'] == null && $id > 0) {
+			return Redirect::to('advertisements_form/-1');
+		}
+		return view('admin.advertisements.form', $data);
+	}
+
+	private function get_advertisements($id)
+	{
+		$obj = CommonManager::getInstance();
+
+		$data = ['id' => $id, 'obj' => null];
+		if ($id > 0) {
+			$reel = $obj->getAdvertisementById($id);
+			if ($reel) {
+				$data = ['id' => $id, 'obj' => $reel];
+			}
+		}
+
+		return $data;
+	}
+
+	public function advertisements_ajax(Request $request)
+	{
+		## Read value
+		$emptyObj = $this->ajax_search($request);
+
+		$order_arr = $request->get('order');
+		$search_arr = $request->get('search');
+
+		$searchValue = $search_arr['value']; // Search value
+
+		// Total records
+		$datatotalRecords = DB::table('advertisements as c')->select('count(*) as allcount');
+		if ($searchValue != null) {
+			$datatotalRecords->where('c.advertisement', 'like', '%' . $searchValue . '%');
+		}
+		$totalRecords = $datatotalRecords->count();
+		$totalRecordswithFilter = $totalRecords;
+
+		// Fetch records
+		$data = DB::table('advertisements as c')
+			->select('c.*')
+			->orderBy('c.id', 'DESC')
+			->skip($emptyObj->start)
+			->take($emptyObj->rowperpage);
+
+		if ($searchValue != null) {
+			$data->where('c.advertisement', 'like', '%' . $searchValue . '%');
+		}
+
+		$records = $data->get();
+		$data_arr = array();
+		$obj = CommonManager::getInstance();
+
+		foreach ($records as $record) {
+			$id = $record->id;
+			$image = '';
+			if ($record->advertisement != null) {
+				$src = cdn($record->advertisement);
+				$image = '<img src="' . $src . '" height="33" />';
+			}
+			// $advertisement = $record->advertisement;
+			$name = $record->name;
+			// $meta_title = $record->meta_title;
+			// $meta_keyword = $record->meta_keyword;
+			// $meta_desc = $record->meta_desc;
+			// $link = $record->link;
+			// $status = $record->status ? 'Active' : 'Inactive';
+			$url = url('advertisements_form', ['id' => $record->id]);
+			$action = "<a href='" . $url . "'>Edit</a>";
+
+			$data_arr[] = array(
+				"no" => $id,
+				"advertisement" => $image,
+				"name" => $name,
+				// "meta_title" => $meta_title,
+				// "meta_keyword" => $meta_keyword,
+				// "meta_desc" => $meta_desc,
+				// "link" => $link,
+				// "status" => $status,
+				"action" => $action
+			);
+		}
+
+		$response = array(
+			"draw" => intval($emptyObj->draw),
+			"iTotalRecords" => $totalRecords,
+			"iTotalDisplayRecords" => $totalRecordswithFilter,
+			"aaData" => $data_arr
+		);
+
+		echo json_encode($response);
+		exit;
+	}
+
+	public function advertisements_handle(Request $request)
+	{
+		if ($request->ajax()) {
+			$id = ($request->id > 0) ? $request->id : 0;
+			$rules = array(
+				'advertisement' => 'mimes:jpeg,jpg,png,gif|max:2048',
+				'name' => 'nullable|max:255',
+				'meta_title' => 'nullable|max:255',
+				'meta_keyword' => 'nullable|max:255',
+				'meta_desc' => 'nullable|max:255',
+				'link' => 'nullable|url|max:255',
+				'type' => 'default:advertisements',
+				// 'status' => 'required|boolean',
+			);
+
+			if ($id > 0) {
+				$rules['advertisement'] = 'mimes:jpeg,jpg,png,gif|max:2048';
+			}
+
+			$validator = Validator::make($request->all(), $rules);
+			if ($validator->fails()) {
+				return response()->json(['status' => 'errors', 'errors' => $validator->getMessageBag()->toArray()]);
+			}
+
+			$params = [
+				// 'advertisement' => $request->advertisement,
+				'name' => $request->name,
+				'meta_title' => $request->meta_title,
+				'meta_keyword' => $request->meta_keyword,
+				'meta_desc' => $request->meta_desc,
+				'link' => $request->link,
+				'status' => $request->status ? 1 : 0,
+				'type' => $request->type ?? 'advertisements',
+			];
+
+			if ($id > 0) {
+				if ($request->hasFile('advertisement')) {
+					$image = $this->uploadAdvertisementsImage($request);
+
+					if ($image === false) {
+						return response()->json(['status' => 'error', 'msg' => 'Image not uploaded']);
+					} else {
+						$params['advertisement'] = $image;
+					}
+				}
+			} else {
+				$image = $this->uploadAdvertisementsImage($request);
+
+				if ($image === false) {
+					return response()->json(['status' => 'error', 'msg' => 'Image not uploaded']);
+				}
+				$params['advertisement'] = $image;
+			}
+
+
+			$commonManagerObj = CommonManager::getInstance();
+			if ($id > 0) {
+				$status = $commonManagerObj->updateadvertisementsById($id, $params);
+				if ($status) {
+					return response()->json(['status' => 'success', 'msg' => 'Successfully Updated']);
+				}
+			} else {
+				$status = $commonManagerObj->insert_advertisements($params);
+				if ($status) {
+					return response()->json(['status' => 'success', 'msg' => 'Successfully Saved']);
+				}
+			}
+
+			return response()->json(['status' => 'error', 'msg' => 'Please try again']);
+		}
+	}
+
+	private function uploadAdvertisementsImage($request)
+	{
+		return $this->uploadImage($request, 'advertisement', 'advertisements')['advertisement'];
+	}
+	/* advertisements End */
+
+
 	/* Story Start */
 	public function story()
 	{

@@ -51,6 +51,8 @@ Route::post('hlike', [AuthController::class, 'handlelike']);
 Route::get('loadcomment/{postid}/{pageid}', [IndexController::class, 'loadcomment']);
 Route::get('detail/{id}', [IndexController::class, 'detail']);
 
+Route::get('advertisements', [IndexController::class, 'getAdvertisements']);
+
 Route::middleware(['auth:api'])->group(function () {
 	Route::post('comment/{type}/{id}', [CommentController::class, 'store']);
 	Route::post('store-image', [ImageController::class, 'store']);
