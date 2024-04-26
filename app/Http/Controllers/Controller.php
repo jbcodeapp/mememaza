@@ -105,18 +105,19 @@ class Controller extends BaseController
                 //system($command);
 
                 if ($isStory) {
-                        $test = ( env('FFMPEG_FULL_PATH'). " ". " -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
-                        \Log::debug("ffmpeg path 1 " . $test);
+                        // $test = ( env('FFMPEG_FULL_PATH'). " ". " -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+                         $test = env('FFMPEG_FULL_PATH') . ' -i '. $filePath .' -ss 3 -t 2 -loop 0 -filter_complex "fps=10, scale=-1:360[s]; [s]split[a][b]; [a]palettegen[palette]; [b][palette]paletteuse" '. $gifVideoPath;
+                        // \Log::debug("ffmpeg path 1 " . $test);
 
-                    exec( env('FFMPEG_FULL_PATH'). " ". " -i $filePath -vf scale=320:-1 -t 3 $gifVideoPath");
+                         exec($test);
 
                     // \Log::debug("story");
                     //vdo_image
                 } else {
-                     $test = (env('FFMPEG_FULL_PATH'). " " ."-i $filePath -vf scale=320:-1 $gifVideoPath");
-                        \Log::debug("ffmpeg path 2 " . $test);
-                        
-                    exec(env('FFMPEG_FULL_PATH'). " " ."-i $filePath -vf scale=320:-1 $gifVideoPath");
+                     //$test = (env('FFMPEG_FULL_PATH'). " " ."-i $filePath -vf scale=320:-1 $gifVideoPath");
+                     $test = env('FFMPEG_FULL_PATH') . ' -i '. $filePath .' -ss 5 -t 2 -loop 0 -filter_complex "fps=10, scale=-1:360[s]; [s]split[a][b]; [a]palettegen[palette]; [b][palette]paletteuse" '. $gifVideoPath;
+                     
+                    exec($test);
 
                     // \Log::debug("reel");
                 }

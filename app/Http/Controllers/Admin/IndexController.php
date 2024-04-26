@@ -942,7 +942,7 @@ class IndexController extends BaseController
 			$story_type = $request->story_type;
 			$rules = array(
 				'story_type' => 'required',
-				'link' => 'required',
+				// 'link' => 'required',
 			);
 
 			if ($id > 0) {
