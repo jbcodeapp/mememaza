@@ -60,7 +60,7 @@
 						<div class="col-12">
 						  <div class="form-group">
 							<label for="exampleInputFile">Thumbnail Image</label>
-							<div class="input-group">
+							<div class="input-group image">
 							  <div class="custom-file">
 								<input type="file" class="custom-file-input image" name="image">
 								<label class="custom-file-label" for="exampleInputFile">Choose file</label>
@@ -76,7 +76,7 @@
 						<div class="col-12">
 						  <div class="form-group">
 							<label for="exampleInputFile">Banner Image</label>
-							<div class="input-group">
+							<div class="input-group banner_image">
 							  <div class="custom-file">
 								<input type="file" class="custom-file-input banner_image" name="banner_image">
 								<label class="custom-file-label" for="exampleInputFile">Choose file</label>

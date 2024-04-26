@@ -260,6 +260,8 @@ class DashboardController extends BaseController
 			$id = ($request->id > 0) ? $request->id : 0;
 			$rules = array(
 				'name' => 'required|unique:categories',
+				'image' => 'required|mimes:jpeg,jpg,png,gif,webp|max:10000',
+				'banner_image' => 'required|mimes:jpeg,jpg,png,gif,webp|max:10000',
 				'meta_title' => 'required',
 				'meta_keyword' => 'required',
 				'meta_desc' => 'required',
